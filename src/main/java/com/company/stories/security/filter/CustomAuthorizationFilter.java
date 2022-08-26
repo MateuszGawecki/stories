@@ -33,11 +33,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         if(request.getServletPath().equals("/api/v1/login")){
             filterChain.doFilter(request,response);
         }else {
-            log.error("DUPA");
             String authorizationHeader = request.getHeader(AUTHORIZATION);
             if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
                 try {
-                    log.error("DUPA2");
                     String token = authorizationHeader.substring("Bearer ".length());
 
                     //TODO powtarza się w filtrach - refactor
@@ -54,7 +52,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     filterChain.doFilter(request, response);
-                    log.error("DUPA2");
                 }catch (Exception ex){
                     log.error("Error logging in: {}", ex.getMessage());
                     response.setHeader("error", ex.getMessage());
