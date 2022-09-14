@@ -35,11 +35,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        Map<String,String[]> dupa = request.getParameterMap();
-        for (String du: dupa.keySet()) {
-            log.error("{}", du);
-        }
-
         String email = request.getParameter("username");
         String password = request.getParameter("password");
         log.info("Authentication attempt performed by user {}", email);
@@ -57,7 +52,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         //TODO tworzenie tokenów w osobnych metodach
         String accessToken = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);

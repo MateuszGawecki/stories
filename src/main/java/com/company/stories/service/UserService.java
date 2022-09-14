@@ -1,7 +1,10 @@
 package com.company.stories.service;
 
+import com.company.stories.model.dto.RoleDTO;
+import com.company.stories.model.dto.UserDTO;
+import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
-import com.company.stories.model.mapper.UserMapper;
+import com.company.stories.repository.RoleRepository;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +17,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -36,19 +42,34 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public User saveUser(User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        log.info("Saving user");
-        return userRepository.save(user);
-    }
+    public User saveUser(UserDTO userDTO){
+        Set<Role> userRoles = new HashSet<>();
 
-    public User updateUser(User user) {
-        Optional<User> dbUser = userRepository.findById(user.getUser_id());
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-        if(dbUser.isEmpty())
-            return null; //TODO exception
+        if(userDTO.getRoles() != null || !userDTO.getRoles().isEmpty()){
+            Set<String> userRolesNames = userDTO.getRoles().stream().map(RoleDTO::getName).collect(Collectors.toSet());
 
-        return userRepository.save(user);
+            for (String roleName: userRolesNames) {
+                Optional<Role> role = roleRepository.findByName(roleName);
+                role.ifPresent(userRoles::add);
+            }
+        }
+
+        User user = User.builder()
+                .name(userDTO.getName())
+                .surname(userDTO.getSurname())
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
+                .roles(userRoles)
+                .build();
+
+        try {
+            return userRepository.saveAndFlush(user);
+        } catch (Exception ex){
+            log.error(ex.getMessage());
+            return null;
+        }
     }
 
     public User getUserByEmail(String email){

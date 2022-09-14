@@ -4,12 +4,18 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.company.stories.model.dto.RoleDTO;
+import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
+import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -47,14 +54,20 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PostMapping("/save")
-    public User saveUser(@RequestBody User user){
-        return userService.saveUser(user);
-    }
+    @PostMapping(value = "/register",
+    consumes = APPLICATION_JSON_VALUE,
+    produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO){
+        log.info("Register attempt performed by user {} {} with email: {} and password: {}",
+                userDTO.getName(),
+                userDTO.getSurname(),
+                userDTO.getEmail(),
+                userDTO.getPassword()
+        );
 
-    @PostMapping("/update")
-    public User updateUser(@RequestBody User user){
-        return userService.updateUser(user);
+        User user = userService.saveUser(userDTO);
+
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
     @GetMapping("/token/refresh")

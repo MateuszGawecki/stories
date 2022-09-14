@@ -11,17 +11,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class UserMapper {
+public abstract class UserMapper {
 
-    private final RoleMapper roleMapper;
-
-    @Autowired
-    public UserMapper(RoleMapper roleMapper) {
-        this.roleMapper = roleMapper;
-    }
-
-
-    public User toUserEntity(UserDTO userDTO){
+    public static User toUserEntity(UserDTO userDTO){
         return User.builder()
                 .user_id(userDTO.getUser_id())
                 .name(userDTO.getName())
@@ -32,7 +24,7 @@ public class UserMapper {
                 .build();
     }
 
-    public UserDTO toUserDTO(User user){
+    public static UserDTO toUserDTO(User user){
         return UserDTO.builder()
                 .user_id(user.getUser_id())
                 .name(user.getName())
@@ -43,15 +35,15 @@ public class UserMapper {
                 .build();
     }
 
-    private Set<RoleDTO> mapToRolesDTO(Set<Role> roles) {
+    private static Set<RoleDTO> mapToRolesDTO(Set<Role> roles) {
         return roles.stream()
-                .map(roleMapper::toRoleDTO)
+                .map(RoleMapper::toRoleDTO)
                 .collect(Collectors.toSet());
     }
 
-    private Set<Role> mapToRolesEntity(Set<RoleDTO> roles) {
+    private static Set<Role> mapToRolesEntity(Set<RoleDTO> roles) {
         return roles.stream()
-                .map(roleMapper::toRoleEntity)
+                .map(RoleMapper::toRoleEntity)
                 .collect(Collectors.toSet());
     }
 }
