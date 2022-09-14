@@ -47,7 +47,7 @@ public class UserService implements UserDetailsService {
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-        if(userDTO.getRoles() != null || !userDTO.getRoles().isEmpty()){
+        if(userDTO.getRoles() != null && !userDTO.getRoles().isEmpty()){
             Set<String> userRolesNames = userDTO.getRoles().stream().map(RoleDTO::getName).collect(Collectors.toSet());
 
             for (String roleName: userRolesNames) {

@@ -67,6 +67,9 @@ public class UserController {
 
         User user = userService.saveUser(userDTO);
 
+        if(user == null)
+            return new ResponseEntity<>("User not created", HttpStatus.NOT_ACCEPTABLE);
+
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
