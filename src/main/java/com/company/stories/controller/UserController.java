@@ -9,10 +9,14 @@ import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
 import com.company.stories.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,13 +96,14 @@ public class UserController {
 
                 String accessToken = JWT.create()
                         .withSubject(user.getEmail())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 1 * 60 * 1000))
                         .withIssuer(request.getRequestURL().toString())
                         .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                         .sign(algorithm);
 
                 Map<String,String> tokens = new HashMap<>();
                 tokens.put("access_token", accessToken);
+                tokens.put("roles", new Gson().toJson(user.getRoles().stream().map(Role::getName).collect(Collectors.toList())));
 
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
@@ -115,5 +120,29 @@ public class UserController {
         }else {
             throw new RuntimeException("Refresh token is missing");
         }
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        Optional<Cookie> refreshTokenCookie = Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals("refresh_token"))
+                .findFirst();
+
+        if(refreshTokenCookie.isEmpty()) {
+            response.setStatus(400); // do zmiany
+            return;
+        }
+
+        String refreshToken = refreshTokenCookie.get().getValue();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .maxAge(0)
+                .secure(true)
+                .sameSite("None")
+                .path("/api")
+                .httpOnly(true)
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
 }

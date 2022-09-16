@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -63,7 +62,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         String refreshToken = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
 
@@ -71,7 +70,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         tokens.put("access_token", accessToken);
         tokens.put("roles", new Gson().toJson(user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())));
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).maxAge(30 * 60 * 1000).secure(true).sameSite("None").httpOnly(true).build();
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).maxAge(3 * 60 * 1000).secure(true).sameSite("None").httpOnly(true).build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
