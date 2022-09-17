@@ -68,7 +68,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         Map<String,String> tokens = new HashMap<>();
         tokens.put("access_token", accessToken);
-        tokens.put("roles", new Gson().toJson(user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())));
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).maxAge(3 * 60 * 1000).secure(true).sameSite("None").httpOnly(true).build();
 

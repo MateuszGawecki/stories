@@ -103,7 +103,6 @@ public class UserController {
 
                 Map<String,String> tokens = new HashMap<>();
                 tokens.put("access_token", accessToken);
-                tokens.put("roles", new Gson().toJson(user.getRoles().stream().map(Role::getName).collect(Collectors.toList())));
 
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
