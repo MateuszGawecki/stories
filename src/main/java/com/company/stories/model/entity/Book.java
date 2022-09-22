@@ -3,14 +3,12 @@ package com.company.stories.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -20,29 +18,22 @@ import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Data
-@Table(name="user", schema = "public")
-public class User {
+@Table(name="book", schema = "public")
+public class Book {
 
     @Id
     @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="user_pk_seq", allocationSize=1)
-    Long user_id;
+    @SequenceGenerator(name="my_seq",sequenceName="book_id_seq", allocationSize=1)
+    Long book_id;
 
-    String name;
+    String title;
 
-    String surname;
-
-    @EqualsAndHashCode.Include
-    String email;
-
-    @EqualsAndHashCode.Include
-    String password;
+    String description;
 
     String image_path;
 
@@ -50,8 +41,8 @@ public class User {
             CascadeType.PERSIST,
             CascadeType.MERGE
     })
-    @JoinTable(name = "user_to_role",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "role_id") })
-    private Set<Role> roles = new HashSet<>();
+    @JoinTable(name = "book_to_author",
+            joinColumns = { @JoinColumn(name = "book_id") },
+            inverseJoinColumns = { @JoinColumn(name = "author_id") })
+    private Set<Author> authors = new HashSet<>();
 }
