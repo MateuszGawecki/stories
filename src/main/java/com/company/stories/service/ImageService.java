@@ -21,12 +21,11 @@ import java.nio.file.Paths;
 public class ImageService {
     String IMAGE_FOLDER_PATH = "D:\\upload\\";
 
-    public String saveImage(MultipartFile image, String imageName) throws IOException {
-        Path filePath = Paths.get(IMAGE_FOLDER_PATH + imageName);
-
+    public String saveImage(MultipartFile image) throws IOException {
+        String newName = System.currentTimeMillis() + image.getOriginalFilename();
+        Path filePath = Paths.get(IMAGE_FOLDER_PATH + newName);
         image.transferTo(filePath);
-
-        return filePath.toString();
+        return newName;
     }
 
     public byte[] findImage(String imageName) {

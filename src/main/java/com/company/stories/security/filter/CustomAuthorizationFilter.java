@@ -59,7 +59,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    filterChain.doFilter(request, response);
                 }catch (Exception ex){
                     log.error("Error in Authorization Filter ");
                     response.setHeader("error", ex.getMessage());
@@ -71,9 +70,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     response.setContentType(APPLICATION_JSON_VALUE);
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
-            }else {
-                filterChain.doFilter(request,response);
             }
+
+            filterChain.doFilter(request, response);
         }
     }
 }
