@@ -29,9 +29,9 @@ public class Author {
     @Id
     @GeneratedValue(generator="my_seq")
     @SequenceGenerator(name="my_seq",sequenceName="author_id_seq", allocationSize=1)
-    Long book_id;
+    Long author_id;
 
-    String author_name;
+    String name;
 
-    String author_surname;
+    String surname;
 }
