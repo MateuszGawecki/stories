@@ -29,10 +29,9 @@ public class ImageController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map uploadImage(@RequestParam MultipartFile image) throws IOException {
+    public String uploadImage(@RequestParam MultipartFile image) throws IOException {
         log.info("Saving image");
-        String imageName = imageService.saveImage(image);
-        return Collections.singletonMap("imageName", imageName);
+        return imageService.saveImage(image);
     }
 
     @GetMapping(value = "/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
