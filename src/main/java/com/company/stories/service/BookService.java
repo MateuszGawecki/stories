@@ -6,11 +6,14 @@ import com.company.stories.model.dto.RoleDTO;
 import com.company.stories.model.entity.Author;
 import com.company.stories.model.entity.Book;
 import com.company.stories.model.entity.Role;
+import com.company.stories.model.mapper.BookMapper;
 import com.company.stories.repository.AuthorRepository;
 import com.company.stories.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -61,7 +64,15 @@ public class BookService {
             return bookRepository.saveAndFlush(book);
         } catch (Exception ex){
             log.error(ex.getMessage());
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot create book");
         }
+    }
+
+    public Set<BookDTO> getBooks(){
+        List<Book> booksDB = bookRepository.findAll();
+
+        return booksDB.stream()
+                .map(BookMapper::toBookDTO)
+                .collect(Collectors.toSet());
     }
 }
