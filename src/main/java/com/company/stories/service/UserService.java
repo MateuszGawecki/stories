@@ -1,6 +1,7 @@
 package com.company.stories.service;
 
-import com.company.stories.model.dto.RoleDTO;
+import com.company.stories.exception.RoleNotFoundException;
+import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
@@ -17,15 +18,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserService implements UserDetailsService {
+    private static final String DEFAULT_ROLE = "user";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -42,19 +42,17 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public User saveUser(UserDTO userDTO){
-        Set<Role> userRoles = new HashSet<>();
+    public User saveNewUser(UserDTO userDTO){
+        Optional<User> dbUser = userRepository.findByEmail(userDTO.getEmail());
+
+        if(dbUser.isPresent())
+            throw new UserAlreadyExistsException(String.format("User with email %s already exist", userDTO.getEmail()));
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-        if(userDTO.getRoles() != null && !userDTO.getRoles().isEmpty()){
-            Set<String> userRolesNames = userDTO.getRoles().stream().map(RoleDTO::getName).collect(Collectors.toSet());
+        Optional<Role> role = roleRepository.findByName(DEFAULT_ROLE);
 
-            for (String roleName: userRolesNames) {
-                Optional<Role> role = roleRepository.findByName(roleName);
-                role.ifPresent(userRoles::add);
-            }
-        }
+        Set<Role> userRoles = Set.of(role.orElseThrow(() -> new RoleNotFoundException(String.format("Role %s not found", DEFAULT_ROLE))));
 
         User user = User.builder()
                 .name(userDTO.getName())
@@ -72,18 +70,16 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User getUserByEmail(String email){
-        return userRepository.findByEmail(email);
-    }
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if(user == null){
+        if(userOptional.isEmpty()){
             log.error("User with email {} not found", email);
             throw new UsernameNotFoundException("User not found");
         }
+
+        User user = userOptional.get();
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));

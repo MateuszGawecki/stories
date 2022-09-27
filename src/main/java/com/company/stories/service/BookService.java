@@ -1,5 +1,7 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.BookAlreadyExistException;
+import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.dto.RoleDTO;
@@ -34,6 +36,12 @@ public class BookService {
     }
 
     public Book createBook(BookDTO bookDTO) {
+        Optional<Book> dbBook = bookRepository.findByTitle(bookDTO.getTitle());
+
+        if(dbBook.isPresent())
+            throw new BookAlreadyExistException(String.format("Book with title %s already exist", bookDTO.getTitle()));
+
+
         Set<Author> authors = new HashSet<>();
 
         if(bookDTO.getAuthors() != null && !bookDTO.getAuthors().isEmpty()){
@@ -64,7 +72,7 @@ public class BookService {
             return bookRepository.saveAndFlush(book);
         } catch (Exception ex){
             log.error(ex.getMessage());
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot create book");
+            return null;
         }
     }
 

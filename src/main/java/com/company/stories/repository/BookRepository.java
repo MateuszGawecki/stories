@@ -4,6 +4,7 @@ import com.company.stories.model.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
@@ -12,4 +13,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Override
     List<Book> findAll();
+
+    Optional<Book> findByTitle(String title);
 }

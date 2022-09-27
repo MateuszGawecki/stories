@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/image")
 @Slf4j
 public class ImageController {
 
-    private ImageService imageService;
+    private final ImageService imageService;
 
     public ImageController(ImageService imageService) {
         this.imageService = imageService;
@@ -34,7 +33,6 @@ public class ImageController {
     @GetMapping(value = "/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] downloadImage(@PathVariable String imageName) throws IOException {
         log.info("Getting image: {}", imageName);
-        //return Base64.getEncoder().encode(imageService.findImage(imageName));
         return imageService.findImage(imageName);
     }
 }

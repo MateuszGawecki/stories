@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,10 +65,7 @@ public class UserController {
                 userDTO.getPassword()
         );
 
-        User user = userService.saveUser(userDTO);
-
-        if(user == null)
-            return new ResponseEntity<>("User not created", HttpStatus.NOT_ACCEPTABLE);
+        User user = userService.saveNewUser(userDTO);
 
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
