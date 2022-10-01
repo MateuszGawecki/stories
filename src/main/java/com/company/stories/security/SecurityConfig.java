@@ -27,6 +27,13 @@ import static org.springframework.http.HttpMethod.GET;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private static final String[] AUTH_WHITE_LIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v2/api-docs/**",
+            "/swagger-resources/**"
+    };
 
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -43,6 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors(Customizer.withDefaults());
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
         http.authorizeRequests().antMatchers("/api/login", "/api/user/token/refresh", "/api/user/register").permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/**").hasAnyAuthority("user");
         http.authorizeRequests().antMatchers("/api/image/**", "/api/book/**").hasAnyAuthority("moderator");
