@@ -1,21 +1,15 @@
 package com.company.stories.service;
 
 import com.company.stories.exception.BookAlreadyExistException;
-import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.dto.BookDTO;
-import com.company.stories.model.dto.RoleDTO;
 import com.company.stories.model.entity.Author;
 import com.company.stories.model.entity.Book;
-import com.company.stories.model.entity.Role;
 import com.company.stories.model.mapper.BookMapper;
-import com.company.stories.repository.AuthorRepository;
 import com.company.stories.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,12 +21,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BookService {
     private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository;
+    private final AuthorService authorService;
 
     @Autowired
-    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
+    public BookService(BookRepository bookRepository, AuthorService authorService) {
         this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
+        this.authorService = authorService;
     }
 
     public Book createBook(BookDTO bookDTO) {
@@ -46,18 +40,8 @@ public class BookService {
 
         if(bookDTO.getAuthors() != null && !bookDTO.getAuthors().isEmpty()){
             for (AuthorDTO authorDTO: bookDTO.getAuthors()) {
-                Optional<Author> author = authorRepository.findByNameAndSurname(authorDTO.getAuthorName(), authorDTO.getAuthorSurname());
-
-                if(author.isPresent()){
-                    authors.add(author.get());
-                }else {
-                    Author author1 = Author.builder()
-                            .name(authorDTO.getAuthorName())
-                            .surname(authorDTO.getAuthorSurname())
-                            .build();
-
-                    authors.add(authorRepository.saveAndFlush(author1));
-                }
+                Author author = authorService.findAuthorByNameAndSurname(authorDTO.getAuthorName(), authorDTO.getAuthorSurname());
+                authors.add(author);
             }
         }
 
