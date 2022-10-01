@@ -4,7 +4,6 @@ import com.company.stories.model.dto.RoleDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
