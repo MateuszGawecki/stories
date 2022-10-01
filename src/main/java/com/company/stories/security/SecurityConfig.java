@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.http.HttpMethod.GET;
 
@@ -32,8 +33,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v2/api-docs/**",
-            "/swagger-resources/**"
+            "/swagger-resources/**",
+
+            "/api/login",
+            "/api/user/token/refresh",
+            "/api/user/register"
     };
+
+    private static final List<String> ALLOWED_ORIGINS = Arrays.asList(
+            "http://127.0.0.1:3000/",
+            "http://localhost:3000/"
+    );
+
+    private static final List<String> ALLOWED_METHODS = Arrays.asList(
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+    );
 
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -51,9 +68,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
-        http.authorizeRequests().antMatchers("/api/login", "/api/user/token/refresh", "/api/user/register").permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/**").hasAnyAuthority("user");
         http.authorizeRequests().antMatchers("/api/image/**", "/api/book/**").hasAnyAuthority("moderator");
+        http.authorizeRequests().antMatchers("/api/role/**").hasAnyAuthority("admin");
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -68,9 +85,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:3000/", "http://localhost:3000/"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedOrigins(ALLOWED_ORIGINS);
+        configuration.setAllowedMethods(ALLOWED_METHODS);
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

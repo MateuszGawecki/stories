@@ -1,11 +1,9 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.RoleNotFoundException;
 import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
-import com.company.stories.repository.RoleRepository;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +26,13 @@ public class UserService implements UserDetailsService {
     private static final String DEFAULT_ROLE = "user";
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -50,9 +48,7 @@ public class UserService implements UserDetailsService {
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-        Optional<Role> role = roleRepository.findByName(DEFAULT_ROLE);
-
-        Set<Role> userRoles = Set.of(role.orElseThrow(() -> new RoleNotFoundException(String.format("Role %s not found", DEFAULT_ROLE))));
+        Set<Role> userRoles = Set.of(roleService.findRoleByName(DEFAULT_ROLE));
 
         User user = User.builder()
                 .name(userDTO.getName())
