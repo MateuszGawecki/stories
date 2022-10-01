@@ -1,6 +1,6 @@
 package com.company.stories.controller;
 
-import com.company.stories.model.entity.Role;
+import com.company.stories.model.dto.RoleDTO;
 import com.company.stories.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/role")
+@RequestMapping("/api/role")
 public class RoleController {
-    //TODO wszędzie DTO
 
     private final RoleService roleService;
 
@@ -24,12 +23,12 @@ public class RoleController {
     }
 
     @GetMapping("get/all")
-    public List<Role> getAllRoles(){
+    public List<RoleDTO> getAllRoles(){
         return roleService.getAllRoles();
     }
 
     @PostMapping("/save")
-    public Role saveUser(@RequestBody Role role){
+    public RoleDTO saveRole(@RequestBody RoleDTO role){
         return roleService.saveRole(role);
     }
 }

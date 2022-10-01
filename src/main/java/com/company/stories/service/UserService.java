@@ -1,9 +1,11 @@
 package com.company.stories.service;
 
 import com.company.stories.exception.UserAlreadyExistsException;
+import com.company.stories.exception.UserNotFoundException;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
+import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,8 +39,35 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
+    public void assingRoleToUser(Long userId, String roleName) {
+        User user = findUser(userId);
+
+        Role role = roleService.findRoleByName(roleName);
+
+        log.info("Assigning role {} to user {}", roleName, user.getName());
+
+        Set<Role> userRoles = user.getRoles();
+
+        userRoles.add(role);
+
+        userRepository.save(user);
+    }
+
+    private User findUser(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+
+        if(user.isEmpty())
+            throw new UserNotFoundException(String.format("User with id %d not found", userId));
+
+        return  user.get();
+    }
+
+    public List<UserDTO> getAllUsers(){
+        List<User> users = userRepository.findAll();
+
+        List<UserDTO> userDTOS = users.stream().map(UserMapper::toUserDTO).collect(Collectors.toList());
+
+        return userDTOS;
     }
 
     public User saveNewUser(UserDTO userDTO){

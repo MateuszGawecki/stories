@@ -70,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/**").hasAnyAuthority("user");
         http.authorizeRequests().antMatchers("/api/image/**", "/api/book/**").hasAnyAuthority("moderator");
-        http.authorizeRequests().antMatchers("/api/role/**").hasAnyAuthority("admin");
+        http.authorizeRequests().antMatchers("/api/user/role/**").hasAnyAuthority("admin");
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
