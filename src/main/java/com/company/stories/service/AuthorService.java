@@ -55,4 +55,33 @@ public class AuthorService {
 
         return AuthorMapper.toAuthorDTO(authorRepository.save(author));
     }
+
+    public void deleteAuthor(Long authorId) {
+        Optional<Author> author = authorRepository.findById(authorId);
+
+        if(author.isEmpty()){
+            throw new AuthorNotFoundException(String.format("Author with id %d was not found", authorId));
+        }
+
+        authorRepository.delete(author.get());
+    }
+
+    public AuthorDTO updateAuthor(AuthorDTO authorDTO) {
+        if(authorDTO.getAuthor_id() == null) {
+            throw new AuthorNotFoundException("Author with Id null not exist");
+        }
+
+        Optional<Author> authorOptional = authorRepository.findById(authorDTO.getAuthor_id());
+
+        if(authorOptional.isEmpty()){
+            throw new AuthorNotFoundException(String.format("Author with id %d was not found", authorDTO.getAuthor_id()));
+        }
+
+        Author author = authorOptional.get();
+
+        author.setName(authorDTO.getAuthorName());
+        author.setSurname(authorDTO.getAuthorSurname());
+
+        return AuthorMapper.toAuthorDTO(authorRepository.save(author));
+    }
 }
