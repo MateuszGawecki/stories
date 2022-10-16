@@ -52,12 +52,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/role/{userId}/{roleName}")
+    @PostMapping("/roles/{userId}/{roleName}")
     public void grantRoleToUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.assingRoleToUser(userId, roleName);
     }
 
-    @DeleteMapping(value = "/role/{userId}/{roleName}")
+    @DeleteMapping(value = "/roles/{userId}/{roleName}")
     public void revokeRoleFromUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.revokeRoleFromUser(userId, roleName);
     }
@@ -67,18 +67,20 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping(value = "/friends/{userId}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{userId}/friends", produces = APPLICATION_JSON_VALUE)
     public List<UserDTO> getUserFriends(@PathVariable Long userId){
         return userService.getUserFriends(userId);
     }
 
-    @PostMapping(value = "/friends/{userId}/{friendId}")
-    public void addFriendForUser(@PathVariable Long userId, @PathVariable Long friendId){
+    @PostMapping(value = "/friends/{friendId}")
+    public void addFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
+        Long userId = getIssuerId(request);
         userService.addFriendForUser(userId, friendId);
     }
 
-    @DeleteMapping(value = "/friends/{userId}/{friendId}")
-    public void removeFriendForUser(@PathVariable Long userId, @PathVariable Long friendId){
+    @DeleteMapping(value = "/friends/{friendId}")
+    public void removeFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
+        Long userId = getIssuerId(request);
         userService.removeFriendForUser(userId, friendId);
     }
 
@@ -147,5 +149,15 @@ public class UserController {
         }
 
         return refreshTokenCookie.get().getValue();
+    }
+
+
+    private Long getIssuerId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.substring("Bearer ".length());
+        DecodedJWT decodedJWT = SecurityUtils.verifyToken(token);
+        String username = decodedJWT.getSubject();
+
+        return userService.getUserId(username);
     }
 }

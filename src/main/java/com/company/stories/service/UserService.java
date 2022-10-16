@@ -169,4 +169,10 @@ public class UserService implements UserDetailsService {
                 authorities
         );
     }
+
+    public Long getUserId(String username) {
+        Optional<User> user = userRepository.findByEmail(username);
+
+        return user.get().getUser_id(); //used when request passed security -> user exists
+    }
 }
