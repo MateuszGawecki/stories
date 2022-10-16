@@ -45,12 +45,25 @@ public class User {
 
     String image_path;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = {
+    @ManyToMany(fetch = FetchType.EAGER,
+            cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE
     })
     @JoinTable(name = "user_to_role",
             joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "role_id") })
+            inverseJoinColumns = { @JoinColumn(name = "role_id")
+    })
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "user_to_user",
+            joinColumns = { @JoinColumn(name = "id_user1")},
+            inverseJoinColumns = {@JoinColumn(name = "id_user2")
+    })
+    private Set<User> friends = new HashSet<>();
 }

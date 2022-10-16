@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,9 +56,29 @@ public class UserController {
         userService.assingRoleToUser(userId, roleName);
     }
 
+    @DeleteMapping(value = "/role/revoke/{userId}/{roleName}")
+    public void revokeRoleFromUser(@PathVariable Long userId, @PathVariable String roleName){
+        userService.revokeRoleFromUser(userId, roleName);
+    }
+
     @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     public List<UserDTO> getAllUsers(){
         return userService.getAllUsers();
+    }
+
+    @GetMapping(value = "/friends/{userId}", produces = APPLICATION_JSON_VALUE)
+    public List<UserDTO> getUserFriends(@PathVariable Long userId){
+        return userService.getUserFriends(userId);
+    }
+
+    @PostMapping(value = "/friends/add/{userId}/{friendId}")
+    public void addFriendForUser(@PathVariable Long userId, @PathVariable Long friendId){
+        userService.addFriendForUser(userId, friendId);
+    }
+
+    @DeleteMapping(value = "/friends/remove/{userId}/{friendId}")
+    public void removeFriendForUser(@PathVariable Long userId, @PathVariable Long friendId){
+        userService.removeFriendForUser(userId, friendId);
     }
 
     @PostMapping(value = "/register",
@@ -76,6 +97,7 @@ public class UserController {
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
+    //TODO transfer to security controller
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String refreshToken = getRefreshTokenFromCookie(request);

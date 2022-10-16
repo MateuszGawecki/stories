@@ -1,6 +1,8 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.CannotDeleteFriendshipException;
 import com.company.stories.exception.UserAlreadyExistsException;
+import com.company.stories.exception.CannotCreateFriendshipException;
 import com.company.stories.exception.UserNotFoundException;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
@@ -51,6 +53,57 @@ public class UserService implements UserDetailsService {
         userRoles.add(role);
 
         userRepository.save(user);
+    }
+
+    public void revokeRoleFromUser(Long userId, String roleName) {
+        User user = findUser(userId);
+
+        Role role = roleService.findRoleByName(roleName);
+
+        log.info("Revoking role {} form user {}", roleName, user.getEmail());
+
+        user.getRoles().remove(role);
+
+        userRepository.save(user);
+    }
+
+    //TODO do przerobienia -> system powinien prosić o potwierdzenie
+    public void addFriendForUser(Long userId, Long friendId) {
+        if(userId.equals(friendId))
+            throw new CannotCreateFriendshipException("Cannot create friendship between one pearson");
+
+        User user = findUser(userId);
+        User friend = findUser(friendId);
+
+        if(user.getFriends().contains(friend))
+            throw new CannotCreateFriendshipException(String.format("Friendship with user %s for user %s already created", user.getEmail(), friend.getEmail()));
+
+        user.getFriends().add(friend);
+
+        userRepository.save(user);
+    }
+
+    //TODO powinno usunąć dwustronnie
+    public void removeFriendForUser(Long userId, Long friendId) {
+        User user = findUser(userId);
+        User friend = findUser(friendId);
+
+        if(!user.getFriends().contains(friend))
+            throw new CannotDeleteFriendshipException(String.format("User %s is not in friendship with %s", user.getEmail(), friend.getEmail()));
+
+        user.getFriends().remove(friend);
+
+        userRepository.save(user);
+    }
+
+    public List<UserDTO> getUserFriends(Long userId){
+        User dbUser = findUser(userId);
+
+        Set<User> userFriends = dbUser.getFriends();
+
+        List<UserDTO> friendsDTOs= userFriends.stream().map(UserMapper::toUserDTO).collect(Collectors.toList());
+
+        return friendsDTOs;
     }
 
     private User findUser(Long userId) {
