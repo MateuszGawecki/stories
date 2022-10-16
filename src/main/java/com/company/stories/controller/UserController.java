@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +37,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @Slf4j
 public class UserController {
     private static final String ACCESS_TOKEN_ID = "access_token";
@@ -51,17 +52,17 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/role/add/{userId}/{roleName}")
+    @PostMapping("/role/{userId}/{roleName}")
     public void grantRoleToUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.assingRoleToUser(userId, roleName);
     }
 
-    @DeleteMapping(value = "/role/revoke/{userId}/{roleName}")
+    @DeleteMapping(value = "/role/{userId}/{roleName}")
     public void revokeRoleFromUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.revokeRoleFromUser(userId, roleName);
     }
 
-    @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public List<UserDTO> getAllUsers(){
         return userService.getAllUsers();
     }
@@ -71,12 +72,12 @@ public class UserController {
         return userService.getUserFriends(userId);
     }
 
-    @PostMapping(value = "/friends/add/{userId}/{friendId}")
+    @PostMapping(value = "/friends/{userId}/{friendId}")
     public void addFriendForUser(@PathVariable Long userId, @PathVariable Long friendId){
         userService.addFriendForUser(userId, friendId);
     }
 
-    @DeleteMapping(value = "/friends/remove/{userId}/{friendId}")
+    @DeleteMapping(value = "/friends/{userId}/{friendId}")
     public void removeFriendForUser(@PathVariable Long userId, @PathVariable Long friendId){
         userService.removeFriendForUser(userId, friendId);
     }

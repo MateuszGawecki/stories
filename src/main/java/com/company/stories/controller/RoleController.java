@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/role")
+@RequestMapping("/api/roles")
 public class RoleController {
 
     private final RoleService roleService;
@@ -22,12 +22,12 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @GetMapping("get/all")
+    @GetMapping()
     public List<RoleDTO> getAllRoles(){
         return roleService.getAllRoles();
     }
 
-    @PostMapping("/save")
+    @PostMapping()
     public RoleDTO saveRole(@RequestBody RoleDTO role){
         return roleService.saveRole(role);
     }
