@@ -1,6 +1,7 @@
 package com.company.stories.service;
 
 import com.company.stories.exception.BookAlreadyExistException;
+import com.company.stories.exception.BookNotExistException;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.entity.Author;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +31,7 @@ public class BookService {
         this.authorService = authorService;
     }
 
-    public Book createBook(BookDTO bookDTO) {
+    public BookDTO createBook(BookDTO bookDTO) {
         Optional<Book> dbBook = bookRepository.findByTitle(bookDTO.getTitle());
 
         if(dbBook.isPresent())
@@ -53,7 +55,8 @@ public class BookService {
                 .build();
 
         try {
-            return bookRepository.saveAndFlush(book);
+            Book dbBook1 = bookRepository.saveAndFlush(book);
+            return BookMapper.toBookDTO(dbBook1);
         } catch (Exception ex){
             log.error(ex.getMessage());
             return null;
@@ -66,5 +69,22 @@ public class BookService {
         return booksDB.stream()
                 .map(BookMapper::toBookDTO)
                 .collect(Collectors.toSet());
+    }
+
+    public BookDTO editBook(BookDTO bookDTO) {
+        Optional<Book> dbBook = bookRepository.findById(Objects.requireNonNull(bookDTO.getBook_id()));
+
+        if(dbBook.isEmpty())
+            throw new BookNotExistException(String.format("Book with id %d not found.", bookDTO.getBook_id()));
+
+        Book newBook = BookMapper.toBookEntity(bookDTO);
+
+        try {
+            Book dbBook1 = bookRepository.saveAndFlush(newBook);
+            return BookMapper.toBookDTO(dbBook1);
+        } catch (Exception ex){
+            log.error(ex.getMessage());
+            return null;
+        }
     }
 }
