@@ -1,6 +1,7 @@
 package com.company.stories.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
@@ -82,6 +83,13 @@ public class UserController {
     public void removeFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
         Long userId = getIssuerId(request);
         userService.removeFriendForUser(userId, friendId);
+    }
+
+    @GetMapping(value = "/books", produces = APPLICATION_JSON_VALUE)
+    public List<UserBookDTO> getUserBooks(HttpServletRequest request){
+        Long issuerId = getIssuerId(request);
+
+        return userService.getUserBooks(issuerId);
     }
 
     @PostMapping(value = "/register",
