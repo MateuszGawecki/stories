@@ -4,9 +4,15 @@ import com.company.stories.exception.CannotDeleteFriendshipException;
 import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.exception.CannotCreateFriendshipException;
 import com.company.stories.exception.UserNotFoundException;
+import com.company.stories.model.dto.BookDTO;
+import com.company.stories.model.dto.CommentDTO;
+import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
+import com.company.stories.model.entity.Book;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
+import com.company.stories.model.mapper.BookMapper;
+import com.company.stories.model.mapper.UserBookMapper;
 import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +37,14 @@ public class UserService implements UserDetailsService {
     private static final String DEFAULT_ROLE = "user";
 
     private final UserRepository userRepository;
+    private final CommentService commentService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, CommentService commentService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.commentService = commentService;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -65,6 +73,30 @@ public class UserService implements UserDetailsService {
         user.getRoles().remove(role);
 
         userRepository.save(user);
+    }
+
+    public List<UserBookDTO> getUserBooks(Long userId){
+        User user = findUser(userId);
+
+        Set<Book> userBooks = user.getUserBooks();
+
+        List<BookDTO> userBookDTOs = userBooks.stream()
+                .map(BookMapper::toBookDTO)
+                .collect(Collectors.toList());
+
+        List<CommentDTO> userComments = commentService.getCommentsForUser(userId);
+
+        List<UserBookDTO> userBookDTOS = userBookDTOs.stream()
+                .map(bookDTO -> UserBookMapper.toUserBookDTO(bookDTO, getCommentsForBook(userComments, bookDTO.getBook_id())))
+                .collect(Collectors.toList());
+
+        return userBookDTOS;
+    }
+
+    private List<CommentDTO> getCommentsForBook(List<CommentDTO> commentDTOS, Long bookId) {
+        return commentDTOS.stream()
+                .filter(commentDTO -> commentDTO.getBookId().equals(bookId))
+                .collect(Collectors.toList());
     }
 
     //TODO do przerobienia -> system powinien prosić o potwierdzenie

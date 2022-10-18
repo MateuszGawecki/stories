@@ -11,5 +11,5 @@ public class UserBookDTO {
 
     BookDTO bookDTO;
 
-    List<String> notes;
+    List<CommentDTO> commentDTOs;
 }
