@@ -1,5 +1,6 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.BookNotFoundException;
 import com.company.stories.exception.CannotDeleteFriendshipException;
 import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.exception.CannotCreateFriendshipException;
@@ -97,6 +98,21 @@ public class UserService implements UserDetailsService {
         return commentDTOS.stream()
                 .filter(commentDTO -> commentDTO.getBookId().equals(bookId))
                 .collect(Collectors.toList());
+    }
+
+    public void addCommentForUserAndBook(Long issuerId, Long bookId, String comment) {
+        User user = findUser(issuerId);
+        Set<Book> books = user.getUserBooks();
+
+        Optional<Long> dbBookId = books.stream()
+                .map(Book::getBook_id)
+                .filter(book_id -> book_id.equals(bookId))
+                .findFirst();
+
+        if(dbBookId.isEmpty())
+            throw new BookNotFoundException("Book not found in private library");
+
+        commentService.addCommentForUserAndBook(user.getUser_id(), dbBookId.get(), comment);
     }
 
     //TODO do przerobienia -> system powinien prosić o potwierdzenie

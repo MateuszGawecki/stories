@@ -92,6 +92,13 @@ public class UserController {
         return userService.getUserBooks(issuerId);
     }
 
+    @PostMapping(value = "/books/{bookId}/comments")
+    public void addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
+        Long issuerId = getIssuerId(request);
+
+        userService.addCommentForUserAndBook(issuerId, bookId, comment);
+    }
+
     @PostMapping(value = "/register",
     consumes = APPLICATION_JSON_VALUE,
     produces = APPLICATION_JSON_VALUE)

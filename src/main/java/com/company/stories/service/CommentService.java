@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,5 +26,15 @@ public class CommentService {
         List<CommentDTO> commentDTOS = userComments.stream().map(CommentMapper::toCommentDTO).collect(Collectors.toList());
 
         return commentDTOS;
+    }
+
+    public void addCommentForUserAndBook(Long userId, Long bookId, String comment) {
+        Comment newComment = Comment.builder()
+                .userId(userId)
+                .bookId(bookId)
+                .comment(comment)
+                .build();
+
+        commentRepository.save(newComment);
     }
 }
