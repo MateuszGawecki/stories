@@ -1,8 +1,10 @@
 package com.company.stories.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
+import com.company.stories.model.entity.Comment;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.UserService;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,10 +96,24 @@ public class UserController {
     }
 
     @PostMapping(value = "/books/{bookId}/comments")
-    public void addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
+    public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
         Long issuerId = getIssuerId(request);
 
-        userService.addCommentForUserAndBook(issuerId, bookId, comment);
+        return userService.addCommentForUserAndBook(issuerId, bookId, comment);
+    }
+
+    @PutMapping(value = "/books/comments")
+    public CommentDTO editComment(HttpServletRequest request, @RequestBody  CommentDTO commentDTO){
+        Long issuerId = getIssuerId(request);
+
+        return userService.editComment(issuerId, commentDTO);
+    }
+
+    @DeleteMapping(value = "/books/comments/{commentId}")
+    public void deleteComment(HttpServletRequest request, @PathVariable Long commentId){
+        Long issuerId = getIssuerId(request);
+
+        userService.deleteComment(issuerId, commentId);
     }
 
     @PostMapping(value = "/register",

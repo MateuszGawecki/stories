@@ -2,6 +2,7 @@ package com.company.stories.service;
 
 import com.company.stories.exception.BookNotFoundException;
 import com.company.stories.exception.CannotDeleteFriendshipException;
+import com.company.stories.exception.OperationNotPermittedException;
 import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.exception.CannotCreateFriendshipException;
 import com.company.stories.exception.UserNotFoundException;
@@ -10,6 +11,7 @@ import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Book;
+import com.company.stories.model.entity.Comment;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
 import com.company.stories.model.mapper.BookMapper;
@@ -100,7 +102,7 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
-    public void addCommentForUserAndBook(Long issuerId, Long bookId, String comment) {
+    public CommentDTO addCommentForUserAndBook(Long issuerId, Long bookId, String comment) {
         User user = findUser(issuerId);
         Set<Book> books = user.getUserBooks();
 
@@ -112,7 +114,25 @@ public class UserService implements UserDetailsService {
         if(dbBookId.isEmpty())
             throw new BookNotFoundException("Book not found in private library");
 
-        commentService.addCommentForUserAndBook(user.getUser_id(), dbBookId.get(), comment);
+        return commentService.addCommentForUserAndBook(user.getUser_id(), dbBookId.get(), comment);
+    }
+
+    public CommentDTO editComment(Long issuerId, CommentDTO commentDTO) {
+        Comment dbComment = commentService.getComment(commentDTO.getComment_id());
+
+        if(!dbComment.getUserId().equals(issuerId))
+            throw new OperationNotPermittedException("This is not your comment");
+
+        return commentService.editComment(dbComment, commentDTO);
+    }
+
+    public void deleteComment(Long issuerId, Long commentId) {
+        Comment dbComment = commentService.getComment(commentId);
+
+        if(!dbComment.getUserId().equals(issuerId))
+            throw new OperationNotPermittedException("This is not your comment");
+
+        commentService.deleteComment(commentId);
     }
 
     //TODO do przerobienia -> system powinien prosić o potwierdzenie
