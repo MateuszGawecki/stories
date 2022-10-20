@@ -6,6 +6,7 @@ import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.entity.Book;
 import com.company.stories.model.entity.Comment;
+import com.company.stories.model.entity.User;
 import com.company.stories.model.entity.UserBook;
 import com.company.stories.model.mapper.CommentMapper;
 import com.company.stories.model.mapper.UserBookMapper;
@@ -32,8 +33,8 @@ public class UserBookService {
         this.commentRepository = commentRepository;
     }
 
-    public List<UserBookDTO> getUserBooks(Long userId) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(userId);
+    public List<UserBookDTO> getUserBooks(User user) {
+        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
 
         List<UserBookDTO> userBookDTOS = userBooks.stream()
                 .map(UserBookMapper::toUserBookDTO)
@@ -42,8 +43,8 @@ public class UserBookService {
         return userBookDTOS;
     }
 
-    public CommentDTO addCommentForUserAndBook(Long userId,Long bookId, String comment){
-        List<UserBook> userBooks = userBookRepository.findByUserId(userId);
+    public CommentDTO addCommentForUserAndBook(User user, Long bookId, String comment){
+        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
 
         Optional<UserBook> userBookOptional = userBooks.stream()
                 .filter(ub -> ub.getBook().getBook_id().equals(bookId))
@@ -72,8 +73,8 @@ public class UserBookService {
         return CommentMapper.toCommentDTO(dbComment);
     }
 
-    public CommentDTO editComment(Long issuerId,Long bookId, CommentDTO commentDTO) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(issuerId);
+    public CommentDTO editComment(User user, Long bookId, CommentDTO commentDTO) {
+        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
 
         UserBook userBook = userBooks.stream()
                 .filter(ub -> ub.getBook().getBook_id().equals(bookId))
@@ -97,8 +98,8 @@ public class UserBookService {
         return CommentMapper.toCommentDTO(updatedComment);
     }
 
-    public void deleteComment(Long issuerId,Long bookId, Long commentId) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(issuerId);
+    public void deleteComment(User user, Long bookId, Long commentId) {
+        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
 
         UserBook userBook = userBooks.stream()
                 .filter(ub -> ub.getBook().getBook_id().equals(bookId))
@@ -118,8 +119,8 @@ public class UserBookService {
     }
 
 
-    public void setUserScore(Long issuerId, Long bookId, Integer newUserScore) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(issuerId);
+    public void setUserScore(User user, Long bookId, Integer newUserScore) {
+        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
 
         UserBook userBook = userBooks.stream()
                 .filter(ub -> ub.getBook().getBook_id().equals(bookId))

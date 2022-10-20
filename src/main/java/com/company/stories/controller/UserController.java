@@ -15,7 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,49 +81,49 @@ public class UserController {
 
     @PostMapping(value = "/friends/{friendId}")
     public void addFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
-        Long userId = getIssuerId(request);
-        userService.addFriendForUser(userId, friendId);
+        User issuer = getIssuerId(request);
+        userService.addFriendForUser(issuer, friendId);
     }
 
     @DeleteMapping(value = "/friends/{friendId}")
     public void removeFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
-        Long userId = getIssuerId(request);
-        userService.removeFriendForUser(userId, friendId);
+        User issuer = getIssuerId(request);
+        userService.removeFriendForUser(issuer, friendId);
     }
 
     @GetMapping(value = "/books", produces = APPLICATION_JSON_VALUE)
     public List<UserBookDTO> getUserBooks(HttpServletRequest request){
-        Long issuerId = getIssuerId(request);
+        User issuer = getIssuerId(request);
 
-        return userBookService.getUserBooks(issuerId);
+        return userBookService.getUserBooks(issuer);
     }
 
     @PostMapping(value = "/books/{bookId}/comments")
     public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
-        Long issuerId = getIssuerId(request);
+        User issuer = getIssuerId(request);
 
-        return userBookService.addCommentForUserAndBook(issuerId, bookId, comment);
+        return userBookService.addCommentForUserAndBook(issuer, bookId, comment);
     }
 
     @PutMapping(value = "/books/{bookId}/comments")
     public CommentDTO editComment(HttpServletRequest request, @PathVariable Long bookId, @RequestBody  CommentDTO commentDTO){
-        Long issuerId = getIssuerId(request);
+        User issuer = getIssuerId(request);
 
-        return userBookService.editComment(issuerId,bookId, commentDTO);
+        return userBookService.editComment(issuer, bookId, commentDTO);
     }
 
     @DeleteMapping(value = "/books/{bookId}/comments/{commentId}")
     public void deleteComment(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Long commentId){
-        Long issuerId = getIssuerId(request);
+        User issuer = getIssuerId(request);
 
-        userBookService.deleteComment(issuerId, bookId, commentId);
+        userBookService.deleteComment(issuer, bookId, commentId);
     }
 
     @PostMapping(value = "/books/{bookId}/score/{userScore}")
     public void setUserScore(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Integer userScore){
-        Long issuerId = getIssuerId(request);
+        User issuer = getIssuerId(request);
 
-        userBookService.setUserScore(issuerId, bookId, userScore);
+        userBookService.setUserScore(issuer, bookId, userScore);
     }
 
     @PostMapping(value = "/register",
@@ -195,12 +194,12 @@ public class UserController {
     }
 
 
-    private Long getIssuerId(HttpServletRequest request) {
+    private User getIssuerId(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader.substring("Bearer ".length());
         DecodedJWT decodedJWT = SecurityUtils.verifyToken(token);
         String username = decodedJWT.getSubject();
 
-        return userService.getUserId(username);
+        return userService.getUser(username);
     }
 }

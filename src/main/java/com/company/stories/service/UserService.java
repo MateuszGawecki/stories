@@ -4,12 +4,9 @@ import com.company.stories.exception.CannotDeleteFriendshipException;
 import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.exception.CannotCreateFriendshipException;
 import com.company.stories.exception.UserNotFoundException;
-import com.company.stories.model.dto.CommentDTO;
-import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
-import com.company.stories.model.entity.UserBook;
 import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -71,11 +68,10 @@ public class UserService implements UserDetailsService {
     }
 
     //TODO do przerobienia -> system powinien prosić o potwierdzenie
-    public void addFriendForUser(Long userId, Long friendId) {
-        if(userId.equals(friendId))
+    public void addFriendForUser(User user, Long friendId) {
+        if(user.getUser_id().equals(friendId))
             throw new CannotCreateFriendshipException("Cannot create friendship between one pearson");
 
-        User user = findUser(userId);
         User friend = findUser(friendId);
 
         if(user.getFriends().contains(friend))
@@ -87,8 +83,7 @@ public class UserService implements UserDetailsService {
     }
 
     //TODO powinno usunąć dwustronnie
-    public void removeFriendForUser(Long userId, Long friendId) {
-        User user = findUser(userId);
+    public void removeFriendForUser(User user, Long friendId) {
         User friend = findUser(friendId);
 
         if(!user.getFriends().contains(friend))
@@ -173,9 +168,9 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public Long getUserId(String username) {
+    public User getUser(String username) {
         Optional<User> user = userRepository.findByEmail(username);
 
-        return user.get().getUser_id(); //used when request passed security -> user exists
+        return user.get(); //used when request passed security -> user exists
     }
 }

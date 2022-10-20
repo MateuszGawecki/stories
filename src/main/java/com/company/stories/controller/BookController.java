@@ -45,4 +45,6 @@ public class BookController {
     }
 
     //TODO query na wyszukiwanie
+
+    //TODO query na polecane
 }
