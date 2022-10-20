@@ -66,15 +66,4 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "id_user2")
     })
     private Set<User> friends = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    @JoinTable(name = "user_to_book",
-            joinColumns = { @JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "book_id")
-            })
-    private Set<Book> userBooks = new HashSet<>();
 }

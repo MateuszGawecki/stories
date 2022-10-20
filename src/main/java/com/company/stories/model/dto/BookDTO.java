@@ -19,5 +19,9 @@ public class BookDTO {
 
     String image_path;
 
+    Float global_score;
+
+    Integer votes;
+
     private Set<AuthorDTO> authors;
 }

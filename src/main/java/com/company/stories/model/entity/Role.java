@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -22,7 +23,8 @@ import javax.persistence.Table;
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator="my_seq")
+    @SequenceGenerator(name="my_seq",sequenceName="role_pk_seq", allocationSize=1)
     Long role_id;
 
     @EqualsAndHashCode.Include

@@ -5,10 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -17,19 +20,13 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Data
-@Table(name="comments", schema = "public")
+@Table(name="comment", schema = "public")
 public class Comment {
 
     @Id
     @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="author_id_seq", allocationSize=1)
+    @SequenceGenerator(name="my_seq",sequenceName="comment_id_seq", allocationSize=1)
     Long comment_id;
-
-    @Column(name="user_id")
-    Long userId;
-
-    @Column(name="book_id")
-    Long bookId;
 
     String comment;
 }

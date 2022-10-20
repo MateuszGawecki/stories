@@ -16,6 +16,8 @@ public abstract class BookMapper {
                 .title(bookDTO.getTitle())
                 .description(bookDTO.getDescription())
                 .image_path(bookDTO.getImage_path())
+                .global_score(bookDTO.getGlobal_score())
+                .votes(bookDTO.getVotes())
                 .authors(toAuthorEntities(bookDTO.getAuthors()))
                 .build();
     }
@@ -26,6 +28,8 @@ public abstract class BookMapper {
                 .title(book.getTitle())
                 .description(book.getDescription())
                 .image_path(book.getImage_path())
+                .global_score(book.getGlobal_score())
+                .votes(book.getVotes())
                 .authors(toAuthorDTOs(book.getAuthors()))
                 .build();
     }

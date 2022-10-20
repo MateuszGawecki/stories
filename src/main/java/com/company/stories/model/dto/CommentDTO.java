@@ -11,9 +11,5 @@ public class CommentDTO {
     @Nullable
     Long comment_id;
 
-    Long userId;
-
-    Long bookId;
-
     String comment;
 }

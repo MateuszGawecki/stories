@@ -1,21 +1,14 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.BookNotFoundException;
 import com.company.stories.exception.CannotDeleteFriendshipException;
-import com.company.stories.exception.OperationNotPermittedException;
 import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.exception.CannotCreateFriendshipException;
 import com.company.stories.exception.UserNotFoundException;
-import com.company.stories.model.dto.BookDTO;
-import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
-import com.company.stories.model.entity.Book;
-import com.company.stories.model.entity.Comment;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
-import com.company.stories.model.mapper.BookMapper;
-import com.company.stories.model.mapper.UserBookMapper;
+import com.company.stories.model.entity.UserBook;
 import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -40,14 +33,14 @@ public class UserService implements UserDetailsService {
     private static final String DEFAULT_ROLE = "user";
 
     private final UserRepository userRepository;
-    private final CommentService commentService;
+    private final UserBookService userBookService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, CommentService commentService, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserBookService userBookService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.commentService = commentService;
+        this.userBookService = userBookService;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -79,61 +72,66 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserBookDTO> getUserBooks(Long userId){
-        User user = findUser(userId);
-
-        Set<Book> userBooks = user.getUserBooks();
-
-        List<BookDTO> userBookDTOs = userBooks.stream()
-                .map(BookMapper::toBookDTO)
-                .collect(Collectors.toList());
-
-        List<CommentDTO> userComments = commentService.getCommentsForUser(userId);
-
-        List<UserBookDTO> userBookDTOS = userBookDTOs.stream()
-                .map(bookDTO -> UserBookMapper.toUserBookDTO(bookDTO, getCommentsForBook(userComments, bookDTO.getBook_id())))
-                .collect(Collectors.toList());
-
-        return userBookDTOS;
+        return userBookService.getUserBooks(userId);
     }
 
-    private List<CommentDTO> getCommentsForBook(List<CommentDTO> commentDTOS, Long bookId) {
-        return commentDTOS.stream()
-                .filter(commentDTO -> commentDTO.getBookId().equals(bookId))
-                .collect(Collectors.toList());
-    }
+    //TODO staremetody
+//    public List<UserBookDTO> getUserBooks(Long userId){
+//        User user = findUser(userId);
+//
+//        Set<Book> userBooks = user.getUserBooks();
+//
+//        List<BookDTO> userBookDTOs = userBooks.stream()
+//                .map(BookMapper::toBookDTO)
+//                .collect(Collectors.toList());
+//
+//        List<CommentDTO> userComments = commentService.getCommentsForUser(userId);
+//
+//        List<UserBookDTO> userBookDTOS = userBookDTOs.stream()
+//                .map(bookDTO -> UserBookMapper.toUserBookDTO(bookDTO, getCommentsForBook(userComments, bookDTO.getBook_id())))
+//                .collect(Collectors.toList());
+//
+//        return userBookDTOS;
+//    }
 
-    public CommentDTO addCommentForUserAndBook(Long issuerId, Long bookId, String comment) {
-        User user = findUser(issuerId);
-        Set<Book> books = user.getUserBooks();
+//    private List<CommentDTO> getCommentsForBook(List<CommentDTO> commentDTOS, Long bookId) {
+//        return commentDTOS.stream()
+//                .filter(commentDTO -> commentDTO.getBookId().equals(bookId))
+//                .collect(Collectors.toList());
+//    }
+//
+//    public CommentDTO addCommentForUserAndBook(Long issuerId, Long bookId, String comment) {
+//        User user = findUser(issuerId);
+//        Set<Book> books = user.getUserBooks();
+//
+//        Optional<Long> dbBookId = books.stream()
+//                .map(Book::getBook_id)
+//                .filter(book_id -> book_id.equals(bookId))
+//                .findFirst();
+//
+//        if(dbBookId.isEmpty())
+//            throw new BookNotFoundException("Book not found in private library");
+//
+//        return commentService.addCommentForUserAndBook(user.getUser_id(), dbBookId.get(), comment);
+//    }
 
-        Optional<Long> dbBookId = books.stream()
-                .map(Book::getBook_id)
-                .filter(book_id -> book_id.equals(bookId))
-                .findFirst();
-
-        if(dbBookId.isEmpty())
-            throw new BookNotFoundException("Book not found in private library");
-
-        return commentService.addCommentForUserAndBook(user.getUser_id(), dbBookId.get(), comment);
-    }
-
-    public CommentDTO editComment(Long issuerId, CommentDTO commentDTO) {
-        Comment dbComment = commentService.getComment(commentDTO.getComment_id());
-
-        if(!dbComment.getUserId().equals(issuerId))
-            throw new OperationNotPermittedException("This is not your comment");
-
-        return commentService.editComment(dbComment, commentDTO);
-    }
-
-    public void deleteComment(Long issuerId, Long commentId) {
-        Comment dbComment = commentService.getComment(commentId);
-
-        if(!dbComment.getUserId().equals(issuerId))
-            throw new OperationNotPermittedException("This is not your comment");
-
-        commentService.deleteComment(commentId);
-    }
+//    public CommentDTO editComment(Long issuerId, CommentDTO commentDTO) {
+//        Comment dbComment = commentService.getComment(commentDTO.getComment_id());
+//
+//        if(!dbComment.getUserId().equals(issuerId))
+//            throw new OperationNotPermittedException("This is not your comment");
+//
+//        return commentService.editComment(dbComment, commentDTO);
+//    }
+//
+//    public void deleteComment(Long issuerId, Long commentId) {
+//        Comment dbComment = commentService.getComment(commentId);
+//
+//        if(!dbComment.getUserId().equals(issuerId))
+//            throw new OperationNotPermittedException("This is not your comment");
+//
+//        commentService.deleteComment(commentId);
+//    }
 
     //TODO do przerobienia -> system powinien prosić o potwierdzenie
     public void addFriendForUser(Long userId, Long friendId) {

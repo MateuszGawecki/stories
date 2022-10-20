@@ -37,6 +37,10 @@ public class Book {
 
     String image_path;
 
+    Float global_score;
+
+    Integer votes;
+
     @ManyToMany(fetch = FetchType.EAGER,cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE

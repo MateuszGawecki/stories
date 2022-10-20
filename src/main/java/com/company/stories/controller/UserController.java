@@ -6,6 +6,7 @@ import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Comment;
 import com.company.stories.model.entity.User;
+import com.company.stories.model.entity.UserBook;
 import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -95,26 +96,26 @@ public class UserController {
         return userService.getUserBooks(issuerId);
     }
 
-    @PostMapping(value = "/books/{bookId}/comments")
-    public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
-        Long issuerId = getIssuerId(request);
-
-        return userService.addCommentForUserAndBook(issuerId, bookId, comment);
-    }
-
-    @PutMapping(value = "/books/comments")
-    public CommentDTO editComment(HttpServletRequest request, @RequestBody  CommentDTO commentDTO){
-        Long issuerId = getIssuerId(request);
-
-        return userService.editComment(issuerId, commentDTO);
-    }
-
-    @DeleteMapping(value = "/books/comments/{commentId}")
-    public void deleteComment(HttpServletRequest request, @PathVariable Long commentId){
-        Long issuerId = getIssuerId(request);
-
-        userService.deleteComment(issuerId, commentId);
-    }
+//    @PostMapping(value = "/books/{bookId}/comments")
+//    public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
+//        Long issuerId = getIssuerId(request);
+//
+//        return userService.addCommentForUserAndBook(issuerId, bookId, comment);
+//    }
+//
+//    @PutMapping(value = "/books/comments")
+//    public CommentDTO editComment(HttpServletRequest request, @RequestBody  CommentDTO commentDTO){
+//        Long issuerId = getIssuerId(request);
+//
+//        return userService.editComment(issuerId, commentDTO);
+//    }
+//
+//    @DeleteMapping(value = "/books/comments/{commentId}")
+//    public void deleteComment(HttpServletRequest request, @PathVariable Long commentId){
+//        Long issuerId = getIssuerId(request);
+//
+//        userService.deleteComment(issuerId, commentId);
+//    }
 
     @PostMapping(value = "/register",
     consumes = APPLICATION_JSON_VALUE,
