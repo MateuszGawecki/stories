@@ -4,6 +4,7 @@ import com.company.stories.exception.CannotDeleteFriendshipException;
 import com.company.stories.exception.UserAlreadyExistsException;
 import com.company.stories.exception.CannotCreateFriendshipException;
 import com.company.stories.exception.UserNotFoundException;
+import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
@@ -73,6 +74,11 @@ public class UserService implements UserDetailsService {
 
     public List<UserBookDTO> getUserBooks(Long userId){
         return userBookService.getUserBooks(userId);
+    }
+
+
+    public CommentDTO addCommentForUserAndBook(Long userId, Long bookId, String comment) {
+        return userBookService.addCommentForUserAndBook(userId, bookId, comment);
     }
 
     //TODO staremetody

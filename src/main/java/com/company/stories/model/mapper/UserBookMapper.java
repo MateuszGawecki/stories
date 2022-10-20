@@ -1,12 +1,9 @@
 package com.company.stories.model.mapper;
 
-import com.company.stories.model.dto.BookDTO;
-import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.entity.UserBook;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component

@@ -7,5 +7,8 @@ import java.util.List;
 
 public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
+    @Override
+    <S extends UserBook> S save(S entity);
+
     List<UserBook> findByUserId(Long userId);
 }

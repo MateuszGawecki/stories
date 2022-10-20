@@ -96,12 +96,12 @@ public class UserController {
         return userService.getUserBooks(issuerId);
     }
 
-//    @PostMapping(value = "/books/{bookId}/comments")
-//    public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
-//        Long issuerId = getIssuerId(request);
-//
-//        return userService.addCommentForUserAndBook(issuerId, bookId, comment);
-//    }
+    @PostMapping(value = "/books/{bookId}/comments")
+    public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
+        Long issuerId = getIssuerId(request);
+
+        return userService.addCommentForUserAndBook(issuerId, bookId, comment);
+    }
 //
 //    @PutMapping(value = "/books/comments")
 //    public CommentDTO editComment(HttpServletRequest request, @RequestBody  CommentDTO commentDTO){

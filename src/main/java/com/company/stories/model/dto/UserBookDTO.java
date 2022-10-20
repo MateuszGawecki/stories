@@ -1,7 +1,5 @@
 package com.company.stories.model.dto;
 
-import com.company.stories.model.entity.Book;
-import com.company.stories.model.entity.Comment;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.lang.Nullable;

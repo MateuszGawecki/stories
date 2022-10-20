@@ -42,7 +42,10 @@ public class UserBook {
     @Column(name = "user_rating")
     Integer userRating;
 
-    @OneToMany
+    @OneToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
     @JoinColumn(name = "user_to_book_id", referencedColumnName = "user_to_book_id")
     List<Comment> comments;
 }

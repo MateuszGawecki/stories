@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,6 +28,9 @@ public class Comment {
     @GeneratedValue(generator="my_seq")
     @SequenceGenerator(name="my_seq",sequenceName="comment_id_seq", allocationSize=1)
     Long comment_id;
+
+    @Column(name = "user_to_book_id")
+    Long userBookId;
 
     String comment;
 }
