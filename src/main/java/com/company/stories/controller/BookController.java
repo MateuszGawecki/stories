@@ -43,4 +43,6 @@ public class BookController {
         log.info("Getting books");
         return bookService.getBooks();
     }
+
+    //TODO query na wyszukiwanie
 }

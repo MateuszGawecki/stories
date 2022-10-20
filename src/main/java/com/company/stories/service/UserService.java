@@ -34,14 +34,12 @@ public class UserService implements UserDetailsService {
     private static final String DEFAULT_ROLE = "user";
 
     private final UserRepository userRepository;
-    private final UserBookService userBookService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserBookService userBookService, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.userBookService = userBookService;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -71,73 +69,6 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
     }
-
-    public List<UserBookDTO> getUserBooks(Long userId){
-        return userBookService.getUserBooks(userId);
-    }
-
-
-    public CommentDTO addCommentForUserAndBook(Long userId, Long bookId, String comment) {
-        return userBookService.addCommentForUserAndBook(userId, bookId, comment);
-    }
-
-    //TODO staremetody
-//    public List<UserBookDTO> getUserBooks(Long userId){
-//        User user = findUser(userId);
-//
-//        Set<Book> userBooks = user.getUserBooks();
-//
-//        List<BookDTO> userBookDTOs = userBooks.stream()
-//                .map(BookMapper::toBookDTO)
-//                .collect(Collectors.toList());
-//
-//        List<CommentDTO> userComments = commentService.getCommentsForUser(userId);
-//
-//        List<UserBookDTO> userBookDTOS = userBookDTOs.stream()
-//                .map(bookDTO -> UserBookMapper.toUserBookDTO(bookDTO, getCommentsForBook(userComments, bookDTO.getBook_id())))
-//                .collect(Collectors.toList());
-//
-//        return userBookDTOS;
-//    }
-
-//    private List<CommentDTO> getCommentsForBook(List<CommentDTO> commentDTOS, Long bookId) {
-//        return commentDTOS.stream()
-//                .filter(commentDTO -> commentDTO.getBookId().equals(bookId))
-//                .collect(Collectors.toList());
-//    }
-//
-//    public CommentDTO addCommentForUserAndBook(Long issuerId, Long bookId, String comment) {
-//        User user = findUser(issuerId);
-//        Set<Book> books = user.getUserBooks();
-//
-//        Optional<Long> dbBookId = books.stream()
-//                .map(Book::getBook_id)
-//                .filter(book_id -> book_id.equals(bookId))
-//                .findFirst();
-//
-//        if(dbBookId.isEmpty())
-//            throw new BookNotFoundException("Book not found in private library");
-//
-//        return commentService.addCommentForUserAndBook(user.getUser_id(), dbBookId.get(), comment);
-//    }
-
-//    public CommentDTO editComment(Long issuerId, CommentDTO commentDTO) {
-//        Comment dbComment = commentService.getComment(commentDTO.getComment_id());
-//
-//        if(!dbComment.getUserId().equals(issuerId))
-//            throw new OperationNotPermittedException("This is not your comment");
-//
-//        return commentService.editComment(dbComment, commentDTO);
-//    }
-//
-//    public void deleteComment(Long issuerId, Long commentId) {
-//        Comment dbComment = commentService.getComment(commentId);
-//
-//        if(!dbComment.getUserId().equals(issuerId))
-//            throw new OperationNotPermittedException("This is not your comment");
-//
-//        commentService.deleteComment(commentId);
-//    }
 
     //TODO do przerobienia -> system powinien prosić o potwierdzenie
     public void addFriendForUser(Long userId, Long friendId) {
