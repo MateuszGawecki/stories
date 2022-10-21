@@ -1,5 +1,6 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.AuthorNotFoundException;
 import com.company.stories.exception.BookAlreadyExistException;
 import com.company.stories.exception.BookNotExistException;
 import com.company.stories.model.dto.AuthorDTO;
@@ -86,5 +87,39 @@ public class BookService {
             log.error(ex.getMessage());
             return null;
         }
+    }
+
+    public Set<BookDTO> findByTitle(String title) {
+        Set<Book> byTitle = bookRepository.findByTitleContainingIgnoreCase(title);
+
+        Set<BookDTO> byTitleDTOs = byTitle.stream()
+                .map(BookMapper::toBookDTO)
+                .collect(Collectors.toSet());
+
+        return byTitleDTOs;
+    }
+
+    public Set<BookDTO> findByAuthor(String author) {
+        String[] names = author.split(" ");
+
+        Set<Book> byAuthorsName;
+
+        if(names.length == 2) {
+            byAuthorsName = bookRepository.findByAuthorsNameContainingAndAuthorsSurnameContainingIgnoreCase(names[0], names[1]);
+        }else if(names.length == 1){
+            byAuthorsName = bookRepository.findByAuthorsNameContainingIgnoreCase(names[0]);
+        }else {
+            throw new AuthorNotFoundException("Cannot find author with more than 2 names");
+        }
+
+        Set<BookDTO> byAuthorDTOs = byAuthorsName.stream()
+                .map(BookMapper::toBookDTO)
+                .collect(Collectors.toSet());
+
+        return byAuthorDTOs;
+    }
+
+    public Set<BookDTO> findByGenre(String genre) {
+        return null;
     }
 }
