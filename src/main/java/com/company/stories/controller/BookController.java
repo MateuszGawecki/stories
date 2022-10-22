@@ -47,7 +47,6 @@ public class BookController {
         return bookService.getBooks();
     }
 
-    //TODO query na wyszukiwanie
     @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<BookDTO> findBooksBySearch(@RequestParam(value = "title", required = false) String title,
                                           @RequestParam(value = "author", required = false) String author,

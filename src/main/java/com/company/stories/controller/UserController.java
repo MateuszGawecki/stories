@@ -49,8 +49,6 @@ public class UserController {
     private static final String ACCESS_TOKEN_ID = "access_token";
     private static final String REFRESH_TOKEN_ID = "refresh_token";
 
-    //TODO wszędzie DTO
-
     private final UserService userService;
     private final UserBookService userBookService;
 
@@ -60,7 +58,6 @@ public class UserController {
         this.userBookService = userBookService;
     }
 
-    //TODO query na wyszukiwanie
     @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<UserDTO> findUsersBySearch(@RequestParam(value = "name") String name){
         return userService.findByName(name);
