@@ -62,7 +62,7 @@ public class UserController {
 
     //TODO query na wyszukiwanie
     @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
-    public Set<UserDTO> findBooksBySearch(@RequestParam(value = "name") String name){
+    public Set<UserDTO> findUsersBySearch(@RequestParam(value = "name") String name){
         return userService.findByName(name);
     }
 
