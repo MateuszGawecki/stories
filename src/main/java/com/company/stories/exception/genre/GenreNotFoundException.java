@@ -1,4 +1,4 @@
-package com.company.stories.exception;
+package com.company.stories.exception.genre;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -1,6 +1,6 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.RoleNotFoundException;
+import com.company.stories.exception.role.RoleNotFoundException;
 import com.company.stories.model.dto.RoleDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.mapper.RoleMapper;

@@ -1,8 +1,8 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.AuthorNotFoundException;
-import com.company.stories.exception.BookAlreadyExistException;
-import com.company.stories.exception.BookNotExistException;
+import com.company.stories.exception.author.AuthorNotFoundException;
+import com.company.stories.exception.book.BookAlreadyExistException;
+import com.company.stories.exception.book.BookNotExistException;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.entity.Author;

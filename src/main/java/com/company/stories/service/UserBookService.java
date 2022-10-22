@@ -1,7 +1,7 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.BookNotFoundException;
-import com.company.stories.exception.CommentNotExistException;
+import com.company.stories.exception.book.BookNotFoundException;
+import com.company.stories.exception.comment.CommentNotExistException;
 import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.entity.Book;
@@ -15,7 +15,6 @@ import com.company.stories.repository.UserBookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;

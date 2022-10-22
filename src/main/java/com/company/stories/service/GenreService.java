@@ -1,7 +1,7 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.GenreAlreadyExistException;
-import com.company.stories.exception.GenreNotFoundException;
+import com.company.stories.exception.genre.GenreAlreadyExistException;
+import com.company.stories.exception.genre.GenreNotFoundException;
 import com.company.stories.model.dto.GenreDTO;
 import com.company.stories.model.entity.Genre;
 import com.company.stories.model.mapper.GenreMapper;

@@ -1,4 +1,4 @@
-package com.company.stories.exception;
+package com.company.stories.exception.user;
 
 public class UserNotFoundException extends RuntimeException{
 

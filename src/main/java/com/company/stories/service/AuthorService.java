@@ -1,7 +1,7 @@
 package com.company.stories.service;
 
 import com.company.stories.exception.AuthorAlreadyExistException;
-import com.company.stories.exception.AuthorNotFoundException;
+import com.company.stories.exception.author.AuthorNotFoundException;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.entity.Author;
 import com.company.stories.model.mapper.AuthorMapper;

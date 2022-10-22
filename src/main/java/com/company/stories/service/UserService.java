@@ -1,9 +1,9 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.CannotDeleteFriendshipException;
-import com.company.stories.exception.UserAlreadyExistsException;
-import com.company.stories.exception.CannotCreateFriendshipException;
-import com.company.stories.exception.UserNotFoundException;
+import com.company.stories.exception.user.CannotDeleteFriendshipException;
+import com.company.stories.exception.user.UserAlreadyExistsException;
+import com.company.stories.exception.user.CannotCreateFriendshipException;
+import com.company.stories.exception.user.UserNotFoundException;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
