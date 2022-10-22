@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -58,6 +61,10 @@ public class UserController {
     }
 
     //TODO query na wyszukiwanie
+    @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
+    public Set<UserDTO> findBooksBySearch(@RequestParam(value = "name") String name){
+        return userService.findByName(name);
+    }
 
     @PostMapping("/roles/{userId}/{roleName}")
     public void grantRoleToUser(@PathVariable Long userId, @PathVariable String roleName){
@@ -81,47 +88,47 @@ public class UserController {
 
     @PostMapping(value = "/friends/{friendId}")
     public void addFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
-        User issuer = getIssuerId(request);
+        User issuer = getIssuer(request);
         userService.addFriendForUser(issuer, friendId);
     }
 
     @DeleteMapping(value = "/friends/{friendId}")
     public void removeFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
-        User issuer = getIssuerId(request);
+        User issuer = getIssuer(request);
         userService.removeFriendForUser(issuer, friendId);
     }
 
     @GetMapping(value = "/books", produces = APPLICATION_JSON_VALUE)
     public List<UserBookDTO> getUserBooks(HttpServletRequest request){
-        User issuer = getIssuerId(request);
+        User issuer = getIssuer(request);
 
         return userBookService.getUserBooks(issuer);
     }
 
     @PostMapping(value = "/books/{bookId}/comments")
     public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
-        User issuer = getIssuerId(request);
+        User issuer = getIssuer(request);
 
         return userBookService.addCommentForUserAndBook(issuer, bookId, comment);
     }
 
     @PutMapping(value = "/books/{bookId}/comments")
     public CommentDTO editComment(HttpServletRequest request, @PathVariable Long bookId, @RequestBody  CommentDTO commentDTO){
-        User issuer = getIssuerId(request);
+        User issuer = getIssuer(request);
 
         return userBookService.editComment(issuer, bookId, commentDTO);
     }
 
     @DeleteMapping(value = "/books/{bookId}/comments/{commentId}")
     public void deleteComment(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Long commentId){
-        User issuer = getIssuerId(request);
+        User issuer = getIssuer(request);
 
         userBookService.deleteComment(issuer, bookId, commentId);
     }
 
     @PostMapping(value = "/books/{bookId}/score/{userScore}")
     public void setUserScore(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Integer userScore){
-        User issuer = getIssuerId(request);
+        User issuer = getIssuer(request);
 
         userBookService.setUserScore(issuer, bookId, userScore);
     }
@@ -194,7 +201,7 @@ public class UserController {
     }
 
 
-    private User getIssuerId(HttpServletRequest request) {
+    private User getIssuer(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader.substring("Bearer ".length());
         DecodedJWT decodedJWT = SecurityUtils.verifyToken(token);

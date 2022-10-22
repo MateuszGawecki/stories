@@ -1,12 +1,16 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.author.AuthorNotFoundException;
 import com.company.stories.exception.user.CannotDeleteFriendshipException;
 import com.company.stories.exception.user.UserAlreadyExistsException;
 import com.company.stories.exception.user.CannotCreateFriendshipException;
 import com.company.stories.exception.user.UserNotFoundException;
+import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.dto.UserDTO;
+import com.company.stories.model.entity.Book;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
+import com.company.stories.model.mapper.BookMapper;
 import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -172,5 +176,25 @@ public class UserService implements UserDetailsService {
         Optional<User> user = userRepository.findByEmail(username);
 
         return user.get(); //used when request passed security -> user exists
+    }
+
+    public Set<UserDTO> findByName(String name) {
+        String[] names = name.split(" ");
+
+        Set<User> byNames;
+
+        if(names.length == 2) {
+            byNames = userRepository.findByNameContainingAndSurnameContainingIgnoreCase(names[0], names[1]);
+        }else if(names.length == 1){
+            byNames = userRepository.findByNameContainingIgnoreCase(names[0]);
+        }else {
+            throw new AuthorNotFoundException("Cannot find author with more than 2 names");
+        }
+
+        Set<UserDTO> byNameDTOs = byNames.stream()
+                .map(UserMapper::toUserDTO)
+                .collect(Collectors.toSet());
+
+        return byNameDTOs;
     }
 }

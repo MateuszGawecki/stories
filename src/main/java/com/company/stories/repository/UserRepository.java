@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -20,4 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
 
     Optional<User> findByEmail(String email);
+
+    Set<User> findByNameContainingAndSurnameContainingIgnoreCase(String name, String surname);
+
+    Set<User> findByNameContainingIgnoreCase(String name);
 }
