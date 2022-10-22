@@ -24,4 +24,6 @@ public class BookDTO {
     Integer votes;
 
     private Set<AuthorDTO> authors;
+
+    private Set<GenreDTO> genres;
 }

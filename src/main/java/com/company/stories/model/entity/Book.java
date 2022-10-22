@@ -49,4 +49,13 @@ public class Book {
             joinColumns = { @JoinColumn(name = "book_id") },
             inverseJoinColumns = { @JoinColumn(name = "author_id") })
     private Set<Author> authors = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER,cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "book_to_genre",
+            joinColumns = { @JoinColumn(name = "book_id") },
+            inverseJoinColumns = { @JoinColumn(name = "genre_id") })
+    private Set<Genre> genres = new HashSet<>();
 }

@@ -7,7 +7,9 @@ import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.entity.Author;
 import com.company.stories.model.entity.Book;
+import com.company.stories.model.mapper.AuthorMapper;
 import com.company.stories.model.mapper.BookMapper;
+import com.company.stories.model.mapper.GenreMapper;
 import com.company.stories.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,14 +80,21 @@ public class BookService {
         if(dbBook.isEmpty())
             throw new BookNotExistException(String.format("Book with id %d not found.", bookDTO.getBook_id()));
 
-        Book newBook = BookMapper.toBookEntity(bookDTO);
+        Book newBook = dbBook.get();
+
+        newBook.setTitle(bookDTO.getTitle());
+        newBook.setDescription(bookDTO.getDescription());
+        newBook.setImage_path(bookDTO.getImage_path());
+        newBook.setAuthors(bookDTO.getAuthors().stream().map(AuthorMapper::toAuthorEntity).collect(Collectors.toSet()));
+        newBook.setGenres(bookDTO.getGenres().stream().map(GenreMapper::toGenreEntity).collect(Collectors.toSet()));
+
 
         try {
             Book dbBook1 = bookRepository.saveAndFlush(newBook);
             return BookMapper.toBookDTO(dbBook1);
         } catch (Exception ex){
             log.error(ex.getMessage());
-            return null;
+            throw new RuntimeException();
         }
     }
 
@@ -120,6 +129,12 @@ public class BookService {
     }
 
     public Set<BookDTO> findByGenre(String genre) {
-        return null;
+        Set<Book> byGenre = bookRepository.findByGenresNameContainingIgnoreCase(genre);
+
+        Set<BookDTO> byGenreDTOs = byGenre.stream()
+                .map(BookMapper::toBookDTO)
+                .collect(Collectors.toSet());
+
+        return byGenreDTOs;
     }
 }
