@@ -34,7 +34,7 @@ public class UserBook {
     @Column(name = "user_id")
     Long userId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "book_id", referencedColumnName = "book_id")
     Book book;
 
@@ -42,7 +42,8 @@ public class UserBook {
     @Column(name = "user_rating")
     Integer userRating;
 
-    @OneToMany(cascade = {
+    @OneToMany(orphanRemoval = true,
+            cascade = {
             CascadeType.ALL
     })
     @JoinColumn(name = "user_to_book_id", referencedColumnName = "user_to_book_id")

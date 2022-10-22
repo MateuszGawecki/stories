@@ -1,5 +1,6 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.book.BookAlreadyExistException;
 import com.company.stories.exception.book.BookNotFoundException;
 import com.company.stories.exception.comment.CommentNotExistException;
 import com.company.stories.model.dto.CommentDTO;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,11 +27,13 @@ import java.util.stream.Collectors;
 public class UserBookService {
     private final UserBookRepository userBookRepository;
     private final CommentRepository commentRepository;
+    private final BookService bookService;
 
     @Autowired
-    public UserBookService(UserBookRepository userBookRepository, CommentRepository commentRepository) {
+    public UserBookService(UserBookRepository userBookRepository, CommentRepository commentRepository, BookService bookService) {
         this.userBookRepository = userBookRepository;
         this.commentRepository = commentRepository;
+        this.bookService = bookService;
     }
 
     public List<UserBookDTO> getUserBooks(User user) {
@@ -40,6 +44,38 @@ public class UserBookService {
                 .collect(Collectors.toList());
 
         return userBookDTOS;
+    }
+
+    public UserBookDTO addBookToUserBooks(User user, Long bookId) {
+        userBookRepository.findByUserId(user.getUser_id()).stream()
+                .filter(userBook -> userBook.getBook().getBook_id().equals(bookId))
+                .findFirst()
+                .ifPresent(s -> {throw new BookAlreadyExistException("Cannot add the same book twice");});
+
+        Book dbBook = bookService.findById(bookId);
+
+        UserBook newUserBook = UserBook.builder()
+                .userId(user.getUser_id())
+                .book(dbBook)
+                .comments(new ArrayList<>())
+                .build();
+
+        return UserBookMapper.toUserBookDTO(userBookRepository.saveAndFlush(newUserBook));
+    }
+
+    public void deleteUserBook(User user, Long userBookId) {
+        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
+
+        UserBook userBookToDelete = userBooks.stream()
+                .filter(userBook -> userBook.getUser_to_book_id().equals(userBookId))
+                .findFirst()
+                .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
+
+        userBookToDelete.getComments().forEach(comment -> commentRepository.deleteById(comment.getComment_id()));
+
+        userBookToDelete.setComments(new ArrayList<>());
+
+        userBookRepository.delete(userBookToDelete);
     }
 
     public CommentDTO addCommentForUserAndBook(User user, Long bookId, String comment){
@@ -113,7 +149,6 @@ public class UserBookService {
         log.error("Deleting {} from book {}", dbComment.getComment(), bookId);
 
         commentRepository.deleteById(dbComment.getComment_id());
-        log.error("Kurwa");
         //userBook.getComments().remove(dbComment);
     }
 

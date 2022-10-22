@@ -102,6 +102,20 @@ public class UserController {
         return userBookService.getUserBooks(issuer);
     }
 
+    @PostMapping(value = "/books/{bookId}", produces = APPLICATION_JSON_VALUE)
+    public UserBookDTO addBookToUserBooks(HttpServletRequest request, @PathVariable Long bookId){
+        User issuer = getIssuer(request);
+
+        return userBookService.addBookToUserBooks(issuer, bookId);
+    }
+
+    @DeleteMapping(value = "/books/{userBookId}")
+    public void deleteUserBook(HttpServletRequest request, @PathVariable Long userBookId){
+        User issuer = getIssuer(request);
+
+        userBookService.deleteUserBook(issuer, userBookId);
+    }
+
     @PostMapping(value = "/books/{bookId}/comments")
     public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
         User issuer = getIssuer(request);

@@ -137,4 +137,13 @@ public class BookService {
 
         return byGenreDTOs;
     }
+
+    public Book findById(Long bookId) {
+        Optional<Book> book = bookRepository.findById(bookId);
+
+        if(book.isEmpty())
+            throw new BookNotExistException(String.format("Book with id %d not found", bookId));
+
+        return book.get();
+    }
 }
