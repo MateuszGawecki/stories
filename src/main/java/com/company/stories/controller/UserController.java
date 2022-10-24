@@ -9,6 +9,8 @@ import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.UserBookService;
 import com.company.stories.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +47,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/api/users")
 @Slf4j
+@Tag(name = "Users", description = "Endpoints for managing users and user's books")
 public class UserController {
     private static final String ACCESS_TOKEN_ID = "access_token";
     private static final String REFRESH_TOKEN_ID = "refresh_token";
@@ -58,43 +61,51 @@ public class UserController {
         this.userBookService = userBookService;
     }
 
+    @Operation(summary = "Searching users in DB, based on their's name and surname separated by white space")
     @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<UserDTO> findUsersBySearch(@RequestParam(value = "name") String name){
         return userService.findByName(name);
     }
 
+    @Operation(summary = "Granting role to user")
     @PostMapping("/roles/{userId}/{roleName}")
     public void grantRoleToUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.assingRoleToUser(userId, roleName);
     }
 
+    @Operation(summary = "Revoking role from user")
     @DeleteMapping(value = "/roles/{userId}/{roleName}")
     public void revokeRoleFromUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.revokeRoleFromUser(userId, roleName);
     }
 
+    @Operation(summary = "Getting all users present in data base")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public List<UserDTO> getAllUsers(){
         return userService.getAllUsers();
     }
 
+    @Operation(summary = "Getting list of requested user's friends")
     @GetMapping(value = "/{userId}/friends", produces = APPLICATION_JSON_VALUE)
     public List<UserDTO> getUserFriends(@PathVariable Long userId){
         return userService.getUserFriends(userId);
     }
 
+    @Operation(summary = "Adding friend")
     @PostMapping(value = "/friends/{friendId}")
     public void addFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
         User issuer = getIssuer(request);
         userService.addFriendForUser(issuer, friendId);
     }
 
+    @Operation(summary = "Removing friend")
     @DeleteMapping(value = "/friends/{friendId}")
     public void removeFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
         User issuer = getIssuer(request);
         userService.removeFriendForUser(issuer, friendId);
     }
 
+    @Operation(summary = "Getting list of private books")
     @GetMapping(value = "/books", produces = APPLICATION_JSON_VALUE)
     public List<UserBookDTO> getUserBooks(HttpServletRequest request){
         User issuer = getIssuer(request);
@@ -102,6 +113,7 @@ public class UserController {
         return userBookService.getUserBooks(issuer);
     }
 
+    @Operation(summary = "Adding book to user private library")
     @PostMapping(value = "/books/{bookId}", produces = APPLICATION_JSON_VALUE)
     public UserBookDTO addBookToUserBooks(HttpServletRequest request, @PathVariable Long bookId){
         User issuer = getIssuer(request);
@@ -109,6 +121,7 @@ public class UserController {
         return userBookService.addBookToUserBooks(issuer, bookId);
     }
 
+    @Operation(summary = "Deleting user private book")
     @DeleteMapping(value = "/books/{userBookId}")
     public void deleteUserBook(HttpServletRequest request, @PathVariable Long userBookId){
         User issuer = getIssuer(request);
@@ -116,6 +129,7 @@ public class UserController {
         userBookService.deleteUserBook(issuer, userBookId);
     }
 
+    @Operation(summary = "Adding comment to user private book")
     @PostMapping(value = "/books/{bookId}/comments")
     public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
         User issuer = getIssuer(request);
@@ -123,6 +137,7 @@ public class UserController {
         return userBookService.addCommentForUserAndBook(issuer, bookId, comment);
     }
 
+    @Operation(summary = "Editing existing comment on user private book")
     @PutMapping(value = "/books/{bookId}/comments")
     public CommentDTO editComment(HttpServletRequest request, @PathVariable Long bookId, @RequestBody  CommentDTO commentDTO){
         User issuer = getIssuer(request);
@@ -130,6 +145,7 @@ public class UserController {
         return userBookService.editComment(issuer, bookId, commentDTO);
     }
 
+    @Operation(summary = "Deleting user comment on private book")
     @DeleteMapping(value = "/books/{bookId}/comments/{commentId}")
     public void deleteComment(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Long commentId){
         User issuer = getIssuer(request);
@@ -137,6 +153,7 @@ public class UserController {
         userBookService.deleteComment(issuer, bookId, commentId);
     }
 
+    @Operation(summary = "Adding user's points score on book which is added to private library")
     @PostMapping(value = "/books/{bookId}/score/{userScore}")
     public void setUserScore(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Integer userScore){
         User issuer = getIssuer(request);
@@ -144,6 +161,9 @@ public class UserController {
         userBookService.setUserScore(issuer, bookId, userScore);
     }
 
+    //TODO transfer to security controller
+
+    @Operation(summary = "Registering new user")
     @PostMapping(value = "/register",
     consumes = APPLICATION_JSON_VALUE,
     produces = APPLICATION_JSON_VALUE)
@@ -160,7 +180,7 @@ public class UserController {
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
-    //TODO transfer to security controller
+    @Operation(summary = "Refreshing access token with refresh token")
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String refreshToken = getRefreshTokenFromCookie(request);
@@ -178,6 +198,7 @@ public class UserController {
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
 
+    @Operation(summary = "Logging out")
     @PostMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = getRefreshTokenFromCookie(request);
