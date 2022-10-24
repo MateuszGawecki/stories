@@ -37,7 +37,7 @@ public class UserBookService {
     }
 
     public List<UserBookDTO> getUserBooks(User user) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
+        List<UserBook> userBooks = findUserBooks(user.getUser_id());
 
         List<UserBookDTO> userBookDTOS = userBooks.stream()
                 .map(UserBookMapper::toUserBookDTO)
@@ -47,7 +47,7 @@ public class UserBookService {
     }
 
     public UserBookDTO addBookToUserBooks(User user, Long bookId) {
-        userBookRepository.findByUserId(user.getUser_id()).stream()
+        findUserBooks(user.getUser_id()).stream()
                 .filter(userBook -> userBook.getBook().getBook_id().equals(bookId))
                 .findFirst()
                 .ifPresent(s -> {throw new BookAlreadyExistException("Cannot add the same book twice");});
@@ -64,7 +64,7 @@ public class UserBookService {
     }
 
     public void deleteUserBook(User user, Long userBookId) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
+        List<UserBook> userBooks = findUserBooks(user.getUser_id());
 
         UserBook userBookToDelete = userBooks.stream()
                 .filter(userBook -> userBook.getUser_to_book_id().equals(userBookId))
@@ -79,16 +79,7 @@ public class UserBookService {
     }
 
     public CommentDTO addCommentForUserAndBook(User user, Long bookId, String comment){
-        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
-
-        Optional<UserBook> userBookOptional = userBooks.stream()
-                .filter(ub -> ub.getBook().getBook_id().equals(bookId))
-                .findFirst();
-
-        if(userBookOptional.isEmpty())
-            throw new BookNotFoundException("Book not found in private library");
-
-        UserBook userBook = userBookOptional.get();
+        UserBook userBook = findUserBook(user.getUser_id(), bookId);
 
         Comment newComment = Comment.builder()
                 .userBookId(userBook.getUser_to_book_id())
@@ -109,12 +100,7 @@ public class UserBookService {
     }
 
     public CommentDTO editComment(User user, Long bookId, CommentDTO commentDTO) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
-
-        UserBook userBook = userBooks.stream()
-                .filter(ub -> ub.getBook().getBook_id().equals(bookId))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
+        UserBook userBook = findUserBook(user.getUser_id(), bookId);
 
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentDTO.getCommentId()))
@@ -134,12 +120,7 @@ public class UserBookService {
     }
 
     public void deleteComment(User user, Long bookId, Long commentId) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
-
-        UserBook userBook = userBooks.stream()
-                .filter(ub -> ub.getBook().getBook_id().equals(bookId))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
+        UserBook userBook = findUserBook(user.getUser_id(), bookId);
 
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentId))
@@ -154,17 +135,23 @@ public class UserBookService {
 
 
     public void setUserScore(User user, Long bookId, Integer newUserScore) {
-        List<UserBook> userBooks = userBookRepository.findByUserId(user.getUser_id());
-
-        UserBook userBook = userBooks.stream()
-                .filter(ub -> ub.getBook().getBook_id().equals(bookId))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
+        UserBook userBook = findUserBook(user.getUser_id(), bookId);
 
         if(userBook.getUserRating() == null)
             addUserScore(userBook, newUserScore);
         else
             editUserScore(userBook, userBook.getUserRating(), newUserScore);
+    }
+
+    private UserBook findUserBook(Long userId, Long bookId){
+        return findUserBooks(userId).stream()
+                .filter(ub -> ub.getBook().getBook_id().equals(bookId))
+                .findFirst()
+                .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
+    }
+
+    private List<UserBook> findUserBooks(Long userId){
+        return userBookRepository.findByUserId(userId);
     }
 
     private void addUserScore(UserBook userBook, Integer userScore) {
