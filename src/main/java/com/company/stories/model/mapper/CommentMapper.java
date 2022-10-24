@@ -9,14 +9,14 @@ public abstract class CommentMapper {
 
     public static Comment toCommentEntity(CommentDTO commentDTO){
         return Comment.builder()
-                .comment_id(commentDTO.getComment_id())
+                .comment_id(commentDTO.getCommentId())
                 .comment(commentDTO.getComment())
                 .build();
     }
 
     public static CommentDTO toCommentDTO(Comment comment){
         return CommentDTO.builder()
-                .comment_id(comment.getComment_id())
+                .commentId(comment.getComment_id())
                 .comment(comment.getComment())
                 .build();
     }

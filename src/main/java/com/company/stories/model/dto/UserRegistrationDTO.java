@@ -6,11 +6,10 @@ import lombok.Data;
 import org.springframework.lang.Nullable;
 
 import java.util.Set;
-
 @Data
 @Builder
 @Schema(name = "UserDTO", description = "Representation of user entity")
-public class UserDTO {
+public class UserRegistrationDTO {
 
     @Schema(name = "userId", description = "Unique user id", example = "1")
     @Nullable
@@ -24,6 +23,9 @@ public class UserDTO {
 
     @Schema(name = "email", description = "Unique user email address", example = "JohnSmith@example.com")
     String email;
+
+    @Schema(name = "password", description = "user password")
+    String password;
 
     @Schema(name = "roles", description = "user roles", example = "[user, admin]")
     @Nullable

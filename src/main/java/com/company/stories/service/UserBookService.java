@@ -117,7 +117,7 @@ public class UserBookService {
                 .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
 
         Comment dbComment = userBook.getComments().stream()
-                .filter(comment -> comment.getComment_id().equals(commentDTO.getComment_id()))
+                .filter(comment -> comment.getComment_id().equals(commentDTO.getCommentId()))
                 .findFirst()
                 .orElseThrow(() -> new CommentNotExistException("Comment not exist"));
 

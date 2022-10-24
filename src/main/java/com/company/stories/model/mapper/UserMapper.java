@@ -14,22 +14,20 @@ public abstract class UserMapper {
 
     public static User toUserEntity(UserDTO userDTO){
         return User.builder()
-                .user_id(userDTO.getUser_id())
+                .user_id(userDTO.getUserId())
                 .name(userDTO.getName())
                 .surname(userDTO.getSurname())
                 .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
                 .roles(mapToRolesEntity(userDTO.getRoles()))
                 .build();
     }
 
     public static UserDTO toUserDTO(User user){
         return UserDTO.builder()
-                .user_id(user.getUser_id())
+                .userId(user.getUser_id())
                 .name(user.getName())
                 .surname(user.getSurname())
                 .email(user.getEmail())
-                .password(user.getPassword())
                 .roles(mapToRolesDTO(user.getRoles()))
                 .build();
     }

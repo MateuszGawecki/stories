@@ -7,6 +7,7 @@ import com.company.stories.exception.user.CannotCreateFriendshipException;
 import com.company.stories.exception.user.UserNotFoundException;
 import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.dto.UserDTO;
+import com.company.stories.model.dto.UserRegistrationDTO;
 import com.company.stories.model.entity.Book;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
@@ -125,7 +126,7 @@ public class UserService implements UserDetailsService {
         return userDTOS;
     }
 
-    public User saveNewUser(UserDTO userDTO){
+    public User saveNewUser(UserRegistrationDTO userDTO){
         Optional<User> dbUser = userRepository.findByEmail(userDTO.getEmail());
 
         if(dbUser.isPresent())

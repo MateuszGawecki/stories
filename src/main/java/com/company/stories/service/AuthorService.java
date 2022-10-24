@@ -67,14 +67,14 @@ public class AuthorService {
     }
 
     public AuthorDTO updateAuthor(AuthorDTO authorDTO) {
-        if(authorDTO.getAuthor_id() == null) {
+        if(authorDTO.getAuthorId() == null) {
             throw new AuthorNotFoundException("Author with Id null not exist");
         }
 
-        Optional<Author> authorOptional = authorRepository.findById(authorDTO.getAuthor_id());
+        Optional<Author> authorOptional = authorRepository.findById(authorDTO.getAuthorId());
 
         if(authorOptional.isEmpty()){
-            throw new AuthorNotFoundException(String.format("Author with id %d was not found", authorDTO.getAuthor_id()));
+            throw new AuthorNotFoundException(String.format("Author with id %d was not found", authorDTO.getAuthorId()));
         }
 
         Author author = authorOptional.get();

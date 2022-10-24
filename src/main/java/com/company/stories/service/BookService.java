@@ -53,7 +53,7 @@ public class BookService {
         Book book = Book.builder()
                 .title(bookDTO.getTitle())
                 .description(bookDTO.getDescription())
-                .image_path(bookDTO.getImage_path())
+                .image_path(bookDTO.getImagePath())
                 .authors(authors)
                 .build();
 
@@ -75,16 +75,16 @@ public class BookService {
     }
 
     public BookDTO editBook(BookDTO bookDTO) {
-        Optional<Book> dbBook = bookRepository.findById(Objects.requireNonNull(bookDTO.getBook_id()));
+        Optional<Book> dbBook = bookRepository.findById(Objects.requireNonNull(bookDTO.getBookId()));
 
         if(dbBook.isEmpty())
-            throw new BookNotExistException(String.format("Book with id %d not found.", bookDTO.getBook_id()));
+            throw new BookNotExistException(String.format("Book with id %d not found.", bookDTO.getBookId()));
 
         Book newBook = dbBook.get();
 
         newBook.setTitle(bookDTO.getTitle());
         newBook.setDescription(bookDTO.getDescription());
-        newBook.setImage_path(bookDTO.getImage_path());
+        newBook.setImage_path(bookDTO.getImagePath());
         newBook.setAuthors(bookDTO.getAuthors().stream().map(AuthorMapper::toAuthorEntity).collect(Collectors.toSet()));
         newBook.setGenres(bookDTO.getGenres().stream().map(GenreMapper::toGenreEntity).collect(Collectors.toSet()));
 

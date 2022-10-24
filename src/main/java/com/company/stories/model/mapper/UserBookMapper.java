@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public abstract class UserBookMapper {
     public static UserBookDTO toUserBookDTO(UserBook userBook){
         return UserBookDTO.builder()
-                .user_to_book_id(userBook.getUser_to_book_id())
+                .userBookId(userBook.getUser_to_book_id())
                 .bookDTO(BookMapper.toBookDTO(userBook.getBook()))
                 .commentDTOs(userBook.getComments().stream().map(CommentMapper::toCommentDTO).collect(Collectors.toList()))
                 .build();

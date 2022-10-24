@@ -9,14 +9,14 @@ public abstract class RoleMapper {
 
     public static Role toRoleEntity(RoleDTO roleDTO){
         return Role.builder()
-                .role_id(roleDTO.getRole_id())
+                .role_id(roleDTO.getRoleId())
                 .name(roleDTO.getName())
                 .build();
     }
 
     public static RoleDTO toRoleDTO(Role role){
         return RoleDTO.builder()
-                .role_id(role.getRole_id())
+                .roleId(role.getRole_id())
                 .name(role.getName())
                 .build();
     }
