@@ -1,6 +1,7 @@
 package com.company.stories.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.dto.UserRegistrationDTO;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
@@ -50,15 +51,15 @@ public class SecurityController {
     @PostMapping(value = "/register",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDTO userDTO){
-        log.info("Register attempt performed by user {} {} with email: {} and password: {}",
+    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO){
+        UserDTO  userDTO = userRegistrationDTO.getUserDTO();
+        log.info("Register attempt performed by user {} {} with email: {}",
                 userDTO.getName(),
                 userDTO.getSurname(),
-                userDTO.getEmail(),
-                userDTO.getPassword()
+                userDTO.getEmail()
         );
 
-        User user = userService.saveNewUser(userDTO);
+        User user = userService.saveNewUser(userRegistrationDTO);
 
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }

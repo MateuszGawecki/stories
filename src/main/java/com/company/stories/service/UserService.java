@@ -126,13 +126,15 @@ public class UserService implements UserDetailsService {
         return userDTOS;
     }
 
-    public User saveNewUser(UserRegistrationDTO userDTO){
+    public User saveNewUser(UserRegistrationDTO userRegistrationDTO){
+        UserDTO userDTO = userRegistrationDTO.getUserDTO();
+
         Optional<User> dbUser = userRepository.findByEmail(userDTO.getEmail());
 
         if(dbUser.isPresent())
             throw new UserAlreadyExistsException(String.format("User with email %s already exist", userDTO.getEmail()));
 
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
 
         Set<Role> userRoles = Set.of(roleService.findRoleByName(DEFAULT_ROLE));
 
@@ -140,7 +142,7 @@ public class UserService implements UserDetailsService {
                 .name(userDTO.getName())
                 .surname(userDTO.getSurname())
                 .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
+                .password(userRegistrationDTO.getPassword())
                 .roles(userRoles)
                 .build();
 
