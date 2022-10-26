@@ -126,7 +126,7 @@ public class UserService implements UserDetailsService {
         return userDTOS;
     }
 
-    public User saveNewUser(UserRegistrationDTO userRegistrationDTO){
+    public UserDTO saveNewUser(UserRegistrationDTO userRegistrationDTO){
         UserDTO userDTO = userRegistrationDTO.getUserDTO();
 
         Optional<User> dbUser = userRepository.findByEmail(userDTO.getEmail());
@@ -147,7 +147,7 @@ public class UserService implements UserDetailsService {
                 .build();
 
         try {
-            return userRepository.saveAndFlush(user);
+            return UserMapper.toUserDTO(userRepository.saveAndFlush(user));
         } catch (Exception ex){
             log.error(ex.getMessage());
             return null;

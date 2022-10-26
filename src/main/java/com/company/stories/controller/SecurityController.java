@@ -51,7 +51,7 @@ public class SecurityController {
     @PostMapping(value = "/register",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO){
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO){
         UserDTO  userDTO = userRegistrationDTO.getUserDTO();
         log.info("Register attempt performed by user {} {} with email: {}",
                 userDTO.getName(),
@@ -59,9 +59,9 @@ public class SecurityController {
                 userDTO.getEmail()
         );
 
-        User user = userService.saveNewUser(userRegistrationDTO);
+        UserDTO user = userService.saveNewUser(userRegistrationDTO);
 
-        return new ResponseEntity<>("OK", HttpStatus.OK);
+        return new ResponseEntity<UserDTO>(user, HttpStatus.OK);
     }
 
     @Operation(summary = "Refreshing access token with refresh token")
