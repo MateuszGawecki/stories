@@ -1,17 +1,14 @@
 package com.company.stories.service;
 
 import com.company.stories.exception.author.AuthorNotFoundException;
-import com.company.stories.exception.user.CannotDeleteFriendshipException;
+import com.company.stories.exception.user.FriendshipNotFoundException;
 import com.company.stories.exception.user.UserAlreadyExistsException;
 import com.company.stories.exception.user.CannotCreateFriendshipException;
 import com.company.stories.exception.user.UserNotFoundException;
-import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.dto.UserRegistrationDTO;
-import com.company.stories.model.entity.Book;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
-import com.company.stories.model.mapper.BookMapper;
 import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +89,7 @@ public class UserService implements UserDetailsService {
         User friend = findUser(friendId);
 
         if(!user.getFriends().contains(friend))
-            throw new CannotDeleteFriendshipException(String.format("User %s is not in friendship with %s", user.getEmail(), friend.getEmail()));
+            throw new FriendshipNotFoundException(String.format("User %s is not in friendship with %s", user.getEmail(), friend.getEmail()));
 
         user.getFriends().remove(friend);
 

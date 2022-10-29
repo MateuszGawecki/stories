@@ -2,7 +2,7 @@ package com.company.stories.service;
 
 import com.company.stories.exception.book.BookAlreadyExistException;
 import com.company.stories.exception.book.BookNotFoundException;
-import com.company.stories.exception.comment.CommentNotExistException;
+import com.company.stories.exception.comment.CommentNotFoundException;
 import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.entity.Book;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -94,7 +93,7 @@ public class UserBookService {
         Comment dbComment = updatedUserBook.getComments().stream()
                 .filter(comment1 -> comment1.getComment().equals(comment))
                 .findFirst()
-                .orElseThrow(() -> new CommentNotExistException("Comment not created"));
+                .orElseThrow(() -> new CommentNotFoundException("Comment not created"));
 
         return CommentMapper.toCommentDTO(dbComment);
     }
@@ -105,7 +104,7 @@ public class UserBookService {
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentDTO.getCommentId()))
                 .findFirst()
-                .orElseThrow(() -> new CommentNotExistException("Comment not exist"));
+                .orElseThrow(() -> new CommentNotFoundException("Comment not exist"));
 
         dbComment.setComment(commentDTO.getComment());
 
@@ -114,7 +113,7 @@ public class UserBookService {
         Comment updatedComment = updatedUserBook.getComments().stream()
                 .filter(comment1 -> comment1.getComment().equals(commentDTO.getComment()))
                 .findFirst()
-                .orElseThrow(() -> new CommentNotExistException("Comment not edited"));
+                .orElseThrow(() -> new CommentNotFoundException("Comment not edited"));
 
         return CommentMapper.toCommentDTO(updatedComment);
     }
@@ -125,7 +124,7 @@ public class UserBookService {
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentId))
                 .findFirst()
-                .orElseThrow(() -> new CommentNotExistException("Comment not exist"));
+                .orElseThrow(() -> new CommentNotFoundException("Comment not exist"));
 
         log.error("Deleting {} from book {}", dbComment.getComment(), bookId);
 
