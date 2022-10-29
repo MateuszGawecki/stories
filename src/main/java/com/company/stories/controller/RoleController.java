@@ -3,6 +3,8 @@ package com.company.stories.controller;
 import com.company.stories.model.dto.RoleDTO;
 import com.company.stories.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,9 @@ public class RoleController {
     }
 
     @PostMapping()
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @Operation(summary = "Creating new role")
     public RoleDTO saveRole(@RequestBody RoleDTO role){
         return roleService.saveRole(role);

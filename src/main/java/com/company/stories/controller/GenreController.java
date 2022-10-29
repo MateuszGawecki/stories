@@ -3,6 +3,8 @@ package com.company.stories.controller;
 import com.company.stories.model.dto.GenreDTO;
 import com.company.stories.service.GenreService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,24 +30,39 @@ public class GenreController {
     }
 
     @Operation(summary = "Getting list of all genres")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @GetMapping
     public List<GenreDTO> getAllGenre(){
         return genreService.getAllGenre();
     }
 
     @Operation(summary = "Creating new genre")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "Genre already exist")
+    })
     @PostMapping
     public GenreDTO createGenre(@RequestBody GenreDTO genreDTO){
         return genreService.createGenre(genreDTO);
     }
 
     @Operation(summary = "Deleting existing genre")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Genre not found")
+    })
     @DeleteMapping("/{genreId}")
     public void deleteGenre(@PathVariable Long genreId){
         genreService.deleteGenre(genreId);
     }
 
     @Operation(summary = "Editing existing genre")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Genre not found")
+    })
     @PutMapping
     public GenreDTO editGenre(@RequestBody GenreDTO genreDTO){
         return genreService.updateGenre(genreDTO);

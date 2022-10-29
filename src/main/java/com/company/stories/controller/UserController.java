@@ -9,6 +9,8 @@ import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.UserBookService;
 import com.company.stories.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,36 +47,59 @@ public class UserController {
     }
 
     @Operation(summary = "Searching users in DB, based on their's name and surname separated by white space")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<UserDTO> findUsersBySearch(@RequestParam(value = "name") String name){
         return userService.findByName(name);
     }
 
     @Operation(summary = "Granting role to user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User or role not found")
+    })
     @PostMapping("/roles/{userId}/{roleName}")
     public void grantRoleToUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.assingRoleToUser(userId, roleName);
     }
 
     @Operation(summary = "Revoking role from user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User or role not found")
+    })
     @DeleteMapping(value = "/roles/{userId}/{roleName}")
     public void revokeRoleFromUser(@PathVariable Long userId, @PathVariable String roleName){
         userService.revokeRoleFromUser(userId, roleName);
     }
 
     @Operation(summary = "Getting all users present in data base")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public List<UserDTO> getAllUsers(){
         return userService.getAllUsers();
     }
 
     @Operation(summary = "Getting list of requested user's friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @GetMapping(value = "/{userId}/friends", produces = APPLICATION_JSON_VALUE)
     public List<UserDTO> getUserFriends(@PathVariable Long userId){
         return userService.getUserFriends(userId);
     }
 
     @Operation(summary = "Adding friend")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "400", description = "Cannot create friendship")
+    })
     @PostMapping(value = "/friends/{friendId}")
     public void addFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
         User issuer = getIssuer(request);
@@ -82,6 +107,10 @@ public class UserController {
     }
 
     @Operation(summary = "Removing friend")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found or friendship not exist")
+    })
     @DeleteMapping(value = "/friends/{friendId}")
     public void removeFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
         User issuer = getIssuer(request);
@@ -89,6 +118,9 @@ public class UserController {
     }
 
     @Operation(summary = "Getting list of private books")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @GetMapping(value = "/books", produces = APPLICATION_JSON_VALUE)
     public List<UserBookDTO> getUserBooks(HttpServletRequest request){
         User issuer = getIssuer(request);
@@ -97,6 +129,11 @@ public class UserController {
     }
 
     @Operation(summary = "Adding book to user private library")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Book not found"),
+            @ApiResponse(responseCode = "400", description = "Cannot add the same book twice")
+    })
     @PostMapping(value = "/books/{bookId}", produces = APPLICATION_JSON_VALUE)
     public UserBookDTO addBookToUserBooks(HttpServletRequest request, @PathVariable Long bookId){
         User issuer = getIssuer(request);
@@ -105,6 +142,10 @@ public class UserController {
     }
 
     @Operation(summary = "Deleting user private book")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Book not found in private library")
+    })
     @DeleteMapping(value = "/books/{userBookId}")
     public void deleteUserBook(HttpServletRequest request, @PathVariable Long userBookId){
         User issuer = getIssuer(request);
@@ -113,6 +154,10 @@ public class UserController {
     }
 
     @Operation(summary = "Adding comment to user private book")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Comment not created")
+    })
     @PostMapping(value = "/books/{bookId}/comments")
     public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
         User issuer = getIssuer(request);
@@ -121,6 +166,10 @@ public class UserController {
     }
 
     @Operation(summary = "Editing existing comment on user private book")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Comment not found or not edited")
+    })
     @PutMapping(value = "/books/{bookId}/comments")
     public CommentDTO editComment(HttpServletRequest request, @PathVariable Long bookId, @RequestBody  CommentDTO commentDTO){
         User issuer = getIssuer(request);
@@ -129,6 +178,10 @@ public class UserController {
     }
 
     @Operation(summary = "Deleting user comment on private book")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Comment not found")
+    })
     @DeleteMapping(value = "/books/{bookId}/comments/{commentId}")
     public void deleteComment(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Long commentId){
         User issuer = getIssuer(request);
@@ -137,6 +190,9 @@ public class UserController {
     }
 
     @Operation(summary = "Adding user's points score on book which is added to private library")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @PostMapping(value = "/books/{bookId}/score/{userScore}")
     public void setUserScore(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Integer userScore){
         User issuer = getIssuer(request);

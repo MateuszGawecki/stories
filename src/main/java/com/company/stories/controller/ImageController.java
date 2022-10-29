@@ -2,6 +2,8 @@ package com.company.stories.controller;
 
 import com.company.stories.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -28,6 +30,9 @@ public class ImageController {
     }
 
     @Operation(summary = "Upload image on server disc")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String uploadImage(@RequestParam MultipartFile image) throws IOException {
         log.info("Saving image");
@@ -35,6 +40,11 @@ public class ImageController {
     }
 
     @Operation(summary = "Get image by it's name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Image not found"),
+            @ApiResponse(responseCode = "500")
+    })
     @GetMapping(value = "/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] downloadImage(@PathVariable String imageName) throws IOException {
         log.info("Getting image: {}", imageName);

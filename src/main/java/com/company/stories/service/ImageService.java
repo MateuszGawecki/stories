@@ -1,5 +1,6 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.image.ImageNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
@@ -31,10 +32,10 @@ public class ImageService {
             return IOUtils.toByteArray(filePath.toUri());
         } catch (FileNotFoundException ex) {
             log.error("File Not Found {}", IMAGE_FOLDER_PATH+imageName);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File Not Found!");
+            throw new ImageNotFoundException(String.format("File with name %s not found", imageName));
         } catch (IOException ex) {
-            log.error("IO Exception occured during reading file {}", IMAGE_FOLDER_PATH+imageName);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IOException!");
+            log.error("IO Exception occurred during reading file {}", IMAGE_FOLDER_PATH+imageName);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "IO Exception occurred during reading file");
         }
     }
 }

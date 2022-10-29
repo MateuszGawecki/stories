@@ -3,6 +3,8 @@ package com.company.stories.controller;
 import com.company.stories.model.dto.BookDTO;
 import com.company.stories.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,10 @@ public class BookController {
     }
 
     @Operation(summary = "Creating new book")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "Book already exist")
+    })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public BookDTO createBook(@RequestBody BookDTO bookDTO) {
         log.info("Creating book: {}", bookDTO.getTitle());
@@ -39,6 +45,10 @@ public class BookController {
     }
 
     @Operation(summary = "Editing existing book")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Book not found")
+    })
     @PutMapping
     public BookDTO editBook(@RequestBody BookDTO bookDTO){
         log.info("Editing book: {}", bookDTO.getTitle());
@@ -47,6 +57,9 @@ public class BookController {
     }
 
     @Operation(summary = "Getting all books")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<BookDTO> getBooks(){
         log.info("Getting books");
@@ -54,6 +67,10 @@ public class BookController {
     }
 
     @Operation(summary = "Searching books by title or author or genre")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "406", description = "No search params")
+    })
     @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<BookDTO> findBooksBySearch(@RequestParam(value = "title", required = false) String title,
                                           @RequestParam(value = "author", required = false) String author,

@@ -3,8 +3,11 @@ package com.company.stories.controller;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.service.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,24 +31,39 @@ public class AuthorController {
     }
 
     @Operation(summary = "Getting list of all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
     @GetMapping
     public List<AuthorDTO> getAllAuthors(){
         return authorService.getAllAuthors();
     }
 
     @Operation(summary = "Creating new author")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "Author already exist")
+    })
     @PostMapping
     public AuthorDTO createAuthor(@RequestBody AuthorDTO authorDTO){
         return authorService.createAuthor(authorDTO);
     }
 
     @Operation(summary = "Deleting existing author")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Author not found")
+    })
     @DeleteMapping("/{authorId}")
     public void deleteAuthor(@PathVariable Long authorId){
         authorService.deleteAuthor(authorId);
     }
 
     @Operation(summary = "Editing existing author")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Author not found")
+    })
     @PutMapping
     public AuthorDTO editAuthor(@RequestBody AuthorDTO authorDTO){
         return authorService.updateAuthor(authorDTO);
