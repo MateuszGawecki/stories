@@ -1,8 +1,8 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.author.AuthorNotFoundException;
+import com.company.stories.exception.OperationNotPermittedException;
 import com.company.stories.exception.book.BookAlreadyExistException;
-import com.company.stories.exception.book.BookNotExistException;
+import com.company.stories.exception.book.BookNotFoundException;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.entity.Author;
@@ -78,7 +78,7 @@ public class BookService {
         Optional<Book> dbBook = bookRepository.findById(Objects.requireNonNull(bookDTO.getBookId()));
 
         if(dbBook.isEmpty())
-            throw new BookNotExistException(String.format("Book with id %d not found.", bookDTO.getBookId()));
+            throw new BookNotFoundException(String.format("Book with id %d not found.", bookDTO.getBookId()));
 
         Book newBook = dbBook.get();
 
@@ -118,7 +118,7 @@ public class BookService {
         }else if(names.length == 1){
             byAuthorsName = bookRepository.findByAuthorsNameContainingIgnoreCase(names[0]);
         }else {
-            throw new AuthorNotFoundException("Cannot find author with more than 2 names");
+            throw new OperationNotPermittedException("Cannot find author with more than 2 names");
         }
 
         Set<BookDTO> byAuthorDTOs = byAuthorsName.stream()
@@ -142,7 +142,7 @@ public class BookService {
         Optional<Book> book = bookRepository.findById(bookId);
 
         if(book.isEmpty())
-            throw new BookNotExistException(String.format("Book with id %d not found", bookId));
+            throw new BookNotFoundException(String.format("Book with id %d not found", bookId));
 
         return book.get();
     }
