@@ -27,7 +27,7 @@ public abstract class BookMapper {
 
     public static BookDTO toBookDTO(Book book){
         return BookDTO.builder()
-                .bookId(book.getBook_id())
+                .bookId(book.getBookId())
                 .title(book.getTitle())
                 .description(book.getDescription())
                 .imagePath(book.getImage_path())

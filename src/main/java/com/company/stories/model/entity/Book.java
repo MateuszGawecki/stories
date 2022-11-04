@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,7 +30,8 @@ public class Book {
     @Id
     @GeneratedValue(generator="my_seq")
     @SequenceGenerator(name="my_seq",sequenceName="book_id_seq", allocationSize=1)
-    Long book_id;
+    @Column(name = "book_id")
+    Long bookId;
 
     String title;
 

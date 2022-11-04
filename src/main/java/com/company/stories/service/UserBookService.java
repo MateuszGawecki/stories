@@ -3,6 +3,7 @@ package com.company.stories.service;
 import com.company.stories.exception.book.BookAlreadyExistException;
 import com.company.stories.exception.book.BookNotFoundException;
 import com.company.stories.exception.comment.CommentNotFoundException;
+import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.entity.Book;
@@ -13,6 +14,8 @@ import com.company.stories.model.mapper.CommentMapper;
 import com.company.stories.model.mapper.UserBookMapper;
 import com.company.stories.repository.CommentRepository;
 import com.company.stories.repository.UserBookRepository;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +50,7 @@ public class UserBookService {
 
     public UserBookDTO addBookToUserBooks(User user, Long bookId) {
         findUserBooks(user.getUser_id()).stream()
-                .filter(userBook -> userBook.getBook().getBook_id().equals(bookId))
+                .filter(userBook -> userBook.getBook().getBookId().equals(bookId))
                 .findFirst()
                 .ifPresent(s -> {throw new BookAlreadyExistException("Cannot add the same book twice");});
 
@@ -144,7 +147,7 @@ public class UserBookService {
 
     private UserBook findUserBook(Long userId, Long bookId){
         return findUserBooks(userId).stream()
-                .filter(ub -> ub.getBook().getBook_id().equals(bookId))
+                .filter(ub -> ub.getBook().getBookId().equals(bookId))
                 .findFirst()
                 .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
     }
@@ -179,5 +182,12 @@ public class UserBookService {
         userBook.setUserRating(newUserScore);
 
         userBookRepository.saveAndFlush(userBook);
+    }
+
+    public List<BookDTO> getRecommendedForUser(User user) {
+        //TODO this is fake for now
+        log.error("Recom");
+
+        return bookService.get3Books();
     }
 }

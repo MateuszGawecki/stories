@@ -13,10 +13,17 @@ import com.company.stories.model.mapper.GenreMapper;
 import com.company.stories.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -55,23 +62,34 @@ public class BookService {
                 .description(bookDTO.getDescription())
                 .image_path(bookDTO.getImagePath())
                 .authors(authors)
+                .global_score(bookDTO.getGlobalScore())
+                .votes(bookDTO.getVotes())
                 .build();
 
         try {
             Book dbBook1 = bookRepository.saveAndFlush(book);
             return BookMapper.toBookDTO(dbBook1);
         } catch (Exception ex){
-            log.error(ex.getMessage());
+            //TODO ten catch jest chuja wart
+            log.error("line 66" + ex.getMessage());
             return null;
         }
     }
 
-    public Set<BookDTO> getBooks(){
-        List<Book> booksDB = bookRepository.findAll();
+    public Map<String, Object> getBooks(Pageable pageable){
+        Page<Book> page = bookRepository.findAll(pageable);
 
-        return booksDB.stream()
+        List<BookDTO> bookDTOs = page.getContent().stream()
                 .map(BookMapper::toBookDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
+
+        Map<String, Object> bookPage = new HashMap<>();
+        bookPage.put("bookDTO", bookDTOs);
+        bookPage.put("currentPage", page.getNumber());
+        bookPage.put("totalItems", page.getTotalElements());
+        bookPage.put("totalPages", page.getTotalPages());
+
+        return bookPage;
     }
 
     public BookDTO editBook(BookDTO bookDTO) {
@@ -145,5 +163,18 @@ public class BookService {
             throw new BookNotFoundException(String.format("Book with id %d not found", bookId));
 
         return book.get();
+    }
+
+    public List<BookDTO> get3Books() {
+
+        List<BookDTO> books1 = new ArrayList<>();
+        Page<Book> books = bookRepository.findAll(
+                PageRequest.of(0, 3, Sort.by(Sort.Direction.ASC, "title")));
+
+        for (Book b: books) {
+            books1.add(BookMapper.toBookDTO(b));
+        }
+
+        return books1;
     }
 }

@@ -1,6 +1,8 @@
 package com.company.stories.repository;
 
 import com.company.stories.model.entity.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,6 +17,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Override
     List<Book> findAll();
 
+    @Override
+    Page<Book> findAll(Pageable pageable);
+
     Optional<Book> findByTitle(String title);
 
     Set<Book> findByTitleContainingIgnoreCase(String title);
@@ -24,5 +29,4 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Set<Book> findByAuthorsNameContainingAndAuthorsSurnameContainingIgnoreCase(String name, String surname);
 
     Set<Book> findByGenresNameContainingIgnoreCase(String genre);
-
 }

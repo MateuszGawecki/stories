@@ -37,8 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-resources/**",
 
             "/api/login",
-            "/api/user/token/refresh",
-            "/api/user/register"
+            "/api/security/token/refresh",
+            "/api/security/register"
     };
 
     private static final List<String> ALLOWED_ORIGINS = Arrays.asList(

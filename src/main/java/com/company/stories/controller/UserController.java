@@ -1,6 +1,7 @@
 package com.company.stories.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.dto.CommentDTO;
 import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
@@ -199,6 +200,18 @@ public class UserController {
 
         userBookService.setUserScore(issuer, bookId, userScore);
     }
+
+    @Operation(summary = "List books recommended for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
+    @GetMapping(value = "/books/recommended", produces = APPLICATION_JSON_VALUE)
+    public List<BookDTO> getRecommended(HttpServletRequest request){
+        User issuer = getIssuer(request);
+
+        return userBookService.getRecommendedForUser(issuer);
+    }
+
 
     private User getIssuer(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
