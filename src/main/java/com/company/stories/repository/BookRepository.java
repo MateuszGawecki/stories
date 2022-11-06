@@ -15,18 +15,15 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     <S extends Book> S save(S entity);
 
     @Override
-    List<Book> findAll();
-
-    @Override
     Page<Book> findAll(Pageable pageable);
 
     Optional<Book> findByTitle(String title);
 
-    Set<Book> findByTitleContainingIgnoreCase(String title);
+    Page<Book> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    Set<Book> findByAuthorsNameContainingIgnoreCase(String name);
+    Page<Book> findByAuthorsNameContainingIgnoreCase(String name, Pageable pageable);
 
-    Set<Book> findByAuthorsNameContainingAndAuthorsSurnameContainingIgnoreCase(String name, String surname);
+    Page<Book> findByAuthorsNameContainingAndAuthorsSurnameContainingIgnoreCase(String name, String surname, Pageable pageable);
 
-    Set<Book> findByGenresNameContainingIgnoreCase(String genre);
+    Page<Book> findByGenresNameContainingIgnoreCase(String genre, Pageable pageable);
 }

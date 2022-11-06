@@ -76,22 +76,6 @@ public class BookService {
         }
     }
 
-    public Map<String, Object> getBooks(Pageable pageable){
-        Page<Book> page = bookRepository.findAll(pageable);
-
-        List<BookDTO> bookDTOs = page.getContent().stream()
-                .map(BookMapper::toBookDTO)
-                .collect(Collectors.toList());
-
-        Map<String, Object> bookPage = new HashMap<>();
-        bookPage.put("bookDTO", bookDTOs);
-        bookPage.put("currentPage", page.getNumber());
-        bookPage.put("totalItems", page.getTotalElements());
-        bookPage.put("totalPages", page.getTotalPages());
-
-        return bookPage;
-    }
-
     public BookDTO editBook(BookDTO bookDTO) {
         Optional<Book> dbBook = bookRepository.findById(Objects.requireNonNull(bookDTO.getBookId()));
 
@@ -116,44 +100,52 @@ public class BookService {
         }
     }
 
-    public Set<BookDTO> findByTitle(String title) {
-        Set<Book> byTitle = bookRepository.findByTitleContainingIgnoreCase(title);
+    public Map<String, Object> getBooks(Pageable pageable){
+        Page<Book> page = bookRepository.findAll(pageable);
 
-        Set<BookDTO> byTitleDTOs = byTitle.stream()
-                .map(BookMapper::toBookDTO)
-                .collect(Collectors.toSet());
-
-        return byTitleDTOs;
+        return getPageOfBooks(page);
     }
 
-    public Set<BookDTO> findByAuthor(String author) {
+    public Map<String, Object> findByTitle(String title, Pageable pageable) {
+        Page<Book> page = bookRepository.findByTitleContainingIgnoreCase(title, pageable);
+
+        return getPageOfBooks(page);
+    }
+
+    public Map<String, Object> findByAuthor(String author, Pageable pageable) {
         String[] names = author.split(" ");
 
-        Set<Book> byAuthorsName;
+        Page<Book> page;
 
         if(names.length == 2) {
-            byAuthorsName = bookRepository.findByAuthorsNameContainingAndAuthorsSurnameContainingIgnoreCase(names[0], names[1]);
+            page = bookRepository.findByAuthorsNameContainingAndAuthorsSurnameContainingIgnoreCase(names[0], names[1], pageable);
         }else if(names.length == 1){
-            byAuthorsName = bookRepository.findByAuthorsNameContainingIgnoreCase(names[0]);
+            page = bookRepository.findByAuthorsNameContainingIgnoreCase(names[0], pageable);
         }else {
             throw new OperationNotPermittedException("Cannot find author with more than 2 names");
         }
 
-        Set<BookDTO> byAuthorDTOs = byAuthorsName.stream()
-                .map(BookMapper::toBookDTO)
-                .collect(Collectors.toSet());
-
-        return byAuthorDTOs;
+        return getPageOfBooks(page);
     }
 
-    public Set<BookDTO> findByGenre(String genre) {
-        Set<Book> byGenre = bookRepository.findByGenresNameContainingIgnoreCase(genre);
+    public Map<String, Object> findByGenre(String genre, Pageable pageable) {
+        Page<Book> page = bookRepository.findByGenresNameContainingIgnoreCase(genre, pageable);
 
-        Set<BookDTO> byGenreDTOs = byGenre.stream()
+        return getPageOfBooks(page);
+    }
+
+    private Map<String, Object> getPageOfBooks(Page<Book> page) {
+        List<BookDTO> bookDTOS = page.getContent().stream()
                 .map(BookMapper::toBookDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
-        return byGenreDTOs;
+        Map<String, Object> bookPage = new HashMap<>();
+        bookPage.put("books", bookDTOS);
+        bookPage.put("currentPage", page.getNumber());
+        bookPage.put("totalItems", page.getTotalElements());
+        bookPage.put("totalPages", page.getTotalPages());
+
+        return bookPage;
     }
 
     public Book findById(Long bookId) {
