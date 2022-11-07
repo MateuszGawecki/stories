@@ -159,11 +159,12 @@ public class UserController {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "404", description = "Comment not created")
     })
-    @PostMapping(value = "/books/{bookId}/comments")
-    public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long bookId, @RequestBody String comment){
+    @PostMapping(value = "/books/{userBookId}/comments")
+    public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long userBookId, @RequestBody String comment){
         User issuer = getIssuer(request);
+        log.info("Adding comment" + comment);
 
-        return userBookService.addCommentForUserAndBook(issuer, bookId, comment);
+        return userBookService.addCommentForUserAndBook(issuer, userBookId, comment);
     }
 
     @Operation(summary = "Editing existing comment on user private book")
@@ -171,11 +172,11 @@ public class UserController {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "404", description = "Comment not found or not edited")
     })
-    @PutMapping(value = "/books/{bookId}/comments")
-    public CommentDTO editComment(HttpServletRequest request, @PathVariable Long bookId, @RequestBody  CommentDTO commentDTO){
+    @PutMapping(value = "/books/{userBookId}/comments")
+    public CommentDTO editComment(HttpServletRequest request, @PathVariable Long userBookId, @RequestBody  CommentDTO commentDTO){
         User issuer = getIssuer(request);
 
-        return userBookService.editComment(issuer, bookId, commentDTO);
+        return userBookService.editComment(issuer, userBookId, commentDTO);
     }
 
     @Operation(summary = "Deleting user comment on private book")
@@ -183,22 +184,22 @@ public class UserController {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "404", description = "Comment not found")
     })
-    @DeleteMapping(value = "/books/{bookId}/comments/{commentId}")
-    public void deleteComment(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Long commentId){
+    @DeleteMapping(value = "/books/{userBookId}/comments/{commentId}")
+    public void deleteComment(HttpServletRequest request, @PathVariable Long userBookId, @PathVariable Long commentId){
         User issuer = getIssuer(request);
 
-        userBookService.deleteComment(issuer, bookId, commentId);
+        userBookService.deleteComment(issuer, userBookId, commentId);
     }
 
     @Operation(summary = "Adding user's points score on book which is added to private library")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200")
     })
-    @PostMapping(value = "/books/{bookId}/score/{userScore}")
-    public void setUserScore(HttpServletRequest request, @PathVariable Long bookId, @PathVariable Integer userScore){
+    @PostMapping(value = "/books/{userBookId}/score/{userScore}")
+    public void setUserScore(HttpServletRequest request, @PathVariable Long userBookId, @PathVariable Integer userScore){
         User issuer = getIssuer(request);
 
-        userBookService.setUserScore(issuer, bookId, userScore);
+        userBookService.setUserScore(issuer, userBookId, userScore);
     }
 
     @Operation(summary = "List books recommended for user")

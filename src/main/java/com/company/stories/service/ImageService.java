@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 @Slf4j
 public class ImageService {
     String IMAGE_FOLDER_PATH = "D:\\upload\\";
+    String DEFAULT_IMAGE = "defaultImage.png";
 
     public String saveImage(MultipartFile image) throws IOException {
         String newName = System.currentTimeMillis() + image.getOriginalFilename();
@@ -32,7 +33,7 @@ public class ImageService {
             return IOUtils.toByteArray(filePath.toUri());
         } catch (FileNotFoundException ex) {
             log.error("File Not Found {}", IMAGE_FOLDER_PATH+imageName);
-            throw new ImageNotFoundException(String.format("File with name %s not found", imageName));
+            return findImage(DEFAULT_IMAGE);
         } catch (IOException ex) {
             log.error("IO Exception occurred during reading file {}", IMAGE_FOLDER_PATH+imageName);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "IO Exception occurred during reading file");

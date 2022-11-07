@@ -80,8 +80,9 @@ public class UserBookService {
         userBookRepository.delete(userBookToDelete);
     }
 
-    public CommentDTO addCommentForUserAndBook(User user, Long bookId, String comment){
-        UserBook userBook = findUserBook(user.getUser_id(), bookId);
+    public CommentDTO addCommentForUserAndBook(User user, Long userBookId, String comment){
+        //TODO zmiana na userBookId
+        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
 
         Comment newComment = Comment.builder()
                 .userBookId(userBook.getUser_to_book_id())
@@ -101,8 +102,9 @@ public class UserBookService {
         return CommentMapper.toCommentDTO(dbComment);
     }
 
-    public CommentDTO editComment(User user, Long bookId, CommentDTO commentDTO) {
-        UserBook userBook = findUserBook(user.getUser_id(), bookId);
+    public CommentDTO editComment(User user, Long userBookId, CommentDTO commentDTO) {
+        //TODO zmiana na userBookId
+        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
 
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentDTO.getCommentId()))
@@ -121,23 +123,25 @@ public class UserBookService {
         return CommentMapper.toCommentDTO(updatedComment);
     }
 
-    public void deleteComment(User user, Long bookId, Long commentId) {
-        UserBook userBook = findUserBook(user.getUser_id(), bookId);
+    public void deleteComment(User user, Long userBookId, Long commentId) {
+        //TODO zmiana na userBookId
+        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
 
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentId))
                 .findFirst()
                 .orElseThrow(() -> new CommentNotFoundException("Comment not exist"));
 
-        log.error("Deleting {} from book {}", dbComment.getComment(), bookId);
+        log.error("Deleting {} from userBook {}", dbComment.getComment(), userBookId);
 
         commentRepository.deleteById(dbComment.getComment_id());
         //userBook.getComments().remove(dbComment);
     }
 
 
-    public void setUserScore(User user, Long bookId, Integer newUserScore) {
-        UserBook userBook = findUserBook(user.getUser_id(), bookId);
+    public void setUserScore(User user, Long userBookId, Integer newUserScore) {
+        //TODO zmiana na userBookId
+        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
 
         if(userBook.getUserRating() == null)
             addUserScore(userBook, newUserScore);
@@ -145,11 +149,14 @@ public class UserBookService {
             editUserScore(userBook, userBook.getUserRating(), newUserScore);
     }
 
-    private UserBook findUserBook(Long userId, Long bookId){
-        return findUserBooks(userId).stream()
-                .filter(ub -> ub.getBook().getBookId().equals(bookId))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
+    private UserBook findUserBook(Long userId, Long userBookId){
+        UserBook userBook = userBookRepository.findById(userBookId)
+                .orElseThrow(() -> new BookNotFoundException("User Book not found"));
+
+        if(userBook.getUserId().equals(userId))
+            return userBook;
+        else
+            throw new BookNotFoundException("Book not found in private library");
     }
 
     private List<UserBook> findUserBooks(Long userId){
