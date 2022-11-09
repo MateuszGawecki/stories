@@ -47,6 +47,8 @@ public class SecurityController {
         this.userService = userService;
     }
 
+    //TODO change user password
+
     @Operation(summary = "Registering new user")
     @PostMapping(value = "/register",
             consumes = APPLICATION_JSON_VALUE,

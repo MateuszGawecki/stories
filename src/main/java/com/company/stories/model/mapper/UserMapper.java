@@ -18,6 +18,7 @@ public abstract class UserMapper {
                 .name(userDTO.getName())
                 .surname(userDTO.getSurname())
                 .email(userDTO.getEmail())
+                .image_path(userDTO.getImagePath())
                 .roles(mapToRolesEntity(userDTO.getRoles()))
                 .build();
     }
@@ -28,6 +29,7 @@ public abstract class UserMapper {
                 .name(user.getName())
                 .surname(user.getSurname())
                 .email(user.getEmail())
+                .imagePath(user.getImage_path())
                 .roles(mapToRolesDTO(user.getRoles()))
                 .build();
     }

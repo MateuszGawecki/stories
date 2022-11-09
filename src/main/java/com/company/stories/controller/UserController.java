@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -45,6 +47,41 @@ public class UserController {
     public UserController(UserService userService, UserBookService userBookService) {
         this.userService = userService;
         this.userBookService = userBookService;
+    }
+
+    //TODO change user name, surname, imagePath
+
+    @Operation(summary = "Change user name, surname or image path")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PutMapping(produces = APPLICATION_JSON_VALUE)
+    public UserDTO editUserInfo(HttpServletRequest request,
+                                @RequestParam(required = false) String name,
+                                @RequestParam(required = false) String surname,
+                                @RequestParam(required = false) String imagePath){
+        User issuer = getIssuer(request);
+
+        if(name != null)
+            issuer.setName(name);
+        else if(surname != null)
+            issuer.setSurname(surname);
+        else if(imagePath != null)
+            issuer.setImage_path(imagePath);
+
+        return userService.updateUser(issuer);
+    }
+
+    @Operation(summary = "Getting user info")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping(value = "/myinfo", produces = APPLICATION_JSON_VALUE)
+    public UserDTO getUserInfo(HttpServletRequest request){
+        User user = getIssuer(request);
+        return userService.getUser(user);
     }
 
     @Operation(summary = "Searching users in DB, based on their's name and surname separated by white space")
@@ -162,7 +199,7 @@ public class UserController {
     @PostMapping(value = "/books/{userBookId}/comments")
     public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long userBookId, @RequestBody String comment){
         User issuer = getIssuer(request);
-        log.info("Adding comment" + comment);
+        log.info("Adding comment " + comment);
 
         return userBookService.addCommentForUserAndBook(issuer, userBookId, comment);
     }

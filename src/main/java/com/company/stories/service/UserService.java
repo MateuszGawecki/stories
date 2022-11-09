@@ -43,6 +43,10 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public UserDTO getUser(User user) {
+        return UserMapper.toUserDTO(user);
+    }
+
     public void assingRoleToUser(Long userId, String roleName) {
         User user = findUser(userId);
 
@@ -196,5 +200,9 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toSet());
 
         return byNameDTOs;
+    }
+
+    public UserDTO updateUser(User issuer) {
+        return UserMapper.toUserDTO(userRepository.save(issuer));
     }
 }

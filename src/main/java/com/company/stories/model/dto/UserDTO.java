@@ -29,6 +29,9 @@ public class UserDTO {
     @Schema(name = "email", description = "Unique user email address", example = "JohnSmith@example.com")
     String email;
 
+    @Schema(name = "imagePath", description = "Path to image", example = "/Hamlet1131123213.jpg")
+    String imagePath;
+
     @Schema(name = "roles", description = "user roles", example = "[user, admin]")
     @Nullable
     Set<RoleDTO> roles;

@@ -12,6 +12,7 @@ public abstract class UserBookMapper {
         return UserBookDTO.builder()
                 .userBookId(userBook.getUser_to_book_id())
                 .bookDTO(BookMapper.toBookDTO(userBook.getBook()))
+                .userRating(userBook.getUserRating())
                 .commentDTOs(userBook.getComments().stream().map(CommentMapper::toCommentDTO).collect(Collectors.toList()))
                 .build();
     }
