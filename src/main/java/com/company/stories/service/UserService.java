@@ -1,5 +1,6 @@
 package com.company.stories.service;
 
+import com.company.stories.exception.OperationNotPermittedException;
 import com.company.stories.exception.author.AuthorNotFoundException;
 import com.company.stories.exception.user.FriendshipNotFoundException;
 import com.company.stories.exception.user.UserAlreadyExistsException;
@@ -152,6 +153,22 @@ public class UserService implements UserDetailsService {
         } catch (Exception ex){
             log.error(ex.getMessage());
             return null;
+        }
+    }
+
+    public void changeUserPassword(User user, String oldPassword, String newPassword){
+
+        if(!passwordEncoder.matches(oldPassword, user.getPassword()))
+            throw new OperationNotPermittedException("Provided password is not users password");
+
+        String newEncodedPassword = passwordEncoder.encode(newPassword);
+
+        user.setPassword(newEncodedPassword);
+
+        try {
+            userRepository.saveAndFlush(user);
+        } catch (Exception ex){
+            log.error(ex.getMessage());
         }
     }
 

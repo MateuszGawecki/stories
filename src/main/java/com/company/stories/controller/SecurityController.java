@@ -9,16 +9,22 @@ import com.company.stories.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -47,7 +54,23 @@ public class SecurityController {
         this.userService = userService;
     }
 
-    //TODO change user password
+
+    @Operation(summary = "Change user password")
+    @PutMapping(value = "/password",
+            consumes = "application/x-www-form-urlencoded",
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> changeUserPassword(HttpServletRequest request, PassChangeDTO passChangeDTO){
+        User user = getIssuer(request);
+        log.info("Password change performed by {} {} with email: {}",
+                user.getName(),
+                user.getSurname(),
+                user.getEmail()
+        );
+
+        userService.changeUserPassword(user, passChangeDTO.getOldPassword(), passChangeDTO.getNewPassword());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @Operation(summary = "Registering new user")
     @PostMapping(value = "/register",
@@ -116,5 +139,21 @@ public class SecurityController {
         }
 
         return refreshTokenCookie.get().getValue();
+    }
+
+    private User getIssuer(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.substring("Bearer ".length());
+        DecodedJWT decodedJWT = SecurityUtils.verifyToken(token);
+        String username = decodedJWT.getSubject();
+
+        return userService.getUser(username);
+    }
+
+    @Getter
+    @AllArgsConstructor
+    private class PassChangeDTO {
+        private String oldPassword;
+        private String newPassword;
     }
 }
