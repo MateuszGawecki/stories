@@ -169,4 +169,14 @@ public class BookService {
 
         return books1;
     }
+
+    public void deleteBook(Long bookId) {
+        Book book = findById(bookId);
+
+        bookRepository.delete(book);
+    }
+
+    public BookDTO getBookWithId(Long bookId) {
+        return BookMapper.toBookDTO(findById(bookId));
+    }
 }
