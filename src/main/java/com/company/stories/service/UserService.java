@@ -6,14 +6,19 @@ import com.company.stories.exception.user.FriendshipNotFoundException;
 import com.company.stories.exception.user.UserAlreadyExistsException;
 import com.company.stories.exception.user.CannotCreateFriendshipException;
 import com.company.stories.exception.user.UserNotFoundException;
+import com.company.stories.model.dto.BookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.dto.UserRegistrationDTO;
+import com.company.stories.model.entity.Book;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
+import com.company.stories.model.mapper.BookMapper;
 import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,7 +28,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,7 +83,7 @@ public class UserService implements UserDetailsService {
 
     //TODO do przerobienia -> system powinien prosić o potwierdzenie
     public void addFriendForUser(User user, Long friendId) {
-        if(user.getUser_id().equals(friendId))
+        if(user.getUserId().equals(friendId))
             throw new CannotCreateFriendshipException("Cannot create friendship between one pearson");
 
         User friend = findUser(friendId);
@@ -120,12 +127,40 @@ public class UserService implements UserDetailsService {
         return  user.get();
     }
 
-    public List<UserDTO> getAllUsers(){
-        List<User> users = userRepository.findAll();
+    public Map<String, Object> getAllUsers(Pageable pageable){
+        Page<User> page = userRepository.findAll(pageable);
 
-        List<UserDTO> userDTOS = users.stream().map(UserMapper::toUserDTO).collect(Collectors.toList());
+        return getPageOfUsers(page);
+    }
 
-        return userDTOS;
+    public Map<String, Object> getByNameAndSurname(String searchValue, Pageable pageable) {
+        String[] names = searchValue.split(" ");
+
+        Page<User> page;
+
+        if(names.length == 2) {
+            page = userRepository.findByNameContainingAndSurnameContainingIgnoreCase(names[0], names[1], pageable);
+        }else if(names.length == 1){
+            page = userRepository.findByNameContainingIgnoreCase(names[0], pageable);
+        }else {
+            throw new OperationNotPermittedException("Cannot find user with more than 2 names");
+        }
+
+        return getPageOfUsers(page);
+    }
+
+    private Map<String, Object> getPageOfUsers(Page<User> page) {
+        List<UserDTO> userDTOS = page.getContent().stream()
+                .map(UserMapper::toUserDTO)
+                .collect(Collectors.toList());
+
+        Map<String, Object> userPage = new HashMap<>();
+        userPage.put("users", userDTOS);
+        userPage.put("currentPage", page.getNumber());
+        userPage.put("totalItems", page.getTotalElements());
+        userPage.put("totalPages", page.getTotalPages());
+
+        return userPage;
     }
 
     public UserDTO saveNewUser(UserRegistrationDTO userRegistrationDTO){

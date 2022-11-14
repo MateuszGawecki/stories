@@ -15,8 +15,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -84,15 +91,6 @@ public class UserController {
         return userService.getUser(user);
     }
 
-    @Operation(summary = "Searching users in DB, based on their's name and surname separated by white space")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200")
-    })
-    @GetMapping(value = "/search",produces = MediaType.APPLICATION_JSON_VALUE)
-    public Set<UserDTO> findUsersBySearch(@RequestParam(value = "name") String name){
-        return userService.findByName(name);
-    }
-
     @Operation(summary = "Granting role to user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
@@ -118,8 +116,65 @@ public class UserController {
             @ApiResponse(responseCode = "200")
     })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public List<UserDTO> getAllUsers(){
-        return userService.getAllUsers();
+    public ResponseEntity<Map<String, Object>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "60") int size,
+            @RequestParam(defaultValue = "userId,desc") String[] sort,
+            @RequestParam(required = false) String searchValue
+    ){
+
+        try {
+            List<Sort.Order> orders = new ArrayList<Sort.Order>();
+
+            if (sort[0].contains(",")) {
+                // will sort more than 2 fields
+                // sortOrder="field, direction"
+                for (String sortOrder : sort) {
+                    String[] _sort = sortOrder.split(",");
+                    orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+                }
+            } else {
+                // sort=[field, direction]
+                orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
+            }
+
+            Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
+
+            Map<String, Object> response = new HashMap<>();
+
+            if(searchValue != null){
+                response = userService.getByNameAndSurname(searchValue, pagingSort);
+            }else {
+                response = userService.getAllUsers(pagingSort);
+            }
+
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private Sort.Direction getSortDirection(String direction) {
+        if (direction.equals("asc")) {
+            return Sort.Direction.ASC;
+        } else if (direction.equals("desc")) {
+            return Sort.Direction.DESC;
+        }
+
+        return Sort.Direction.ASC;
+    }
+
+    @Operation(summary = "Getting list of friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping(value = "/friends", produces = APPLICATION_JSON_VALUE)
+    public List<UserDTO> getUserFriends(HttpServletRequest request){
+        User issuer = getIssuer(request);
+        return userService.getUserFriends(issuer.getUserId());
     }
 
     @Operation(summary = "Getting list of requested user's friends")

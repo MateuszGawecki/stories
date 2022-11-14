@@ -14,7 +14,7 @@ public abstract class UserMapper {
 
     public static User toUserEntity(UserDTO userDTO){
         return User.builder()
-                .user_id(userDTO.getUserId())
+                .userId(userDTO.getUserId())
                 .name(userDTO.getName())
                 .surname(userDTO.getSurname())
                 .email(userDTO.getEmail())
@@ -25,7 +25,7 @@ public abstract class UserMapper {
 
     public static UserDTO toUserDTO(User user){
         return UserDTO.builder()
-                .userId(user.getUser_id())
+                .userId(user.getUserId())
                 .name(user.getName())
                 .surname(user.getSurname())
                 .email(user.getEmail())

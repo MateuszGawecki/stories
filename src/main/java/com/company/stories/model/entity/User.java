@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,7 +32,8 @@ public class User {
     @Id
     @GeneratedValue(generator="my_seq")
     @SequenceGenerator(name="my_seq",sequenceName="user_pk_seq", allocationSize=1)
-    Long user_id;
+    @Column(name = "user_id")
+    Long userId;
 
     String name;
 

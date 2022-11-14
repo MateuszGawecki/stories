@@ -39,7 +39,7 @@ public class UserBookService {
     }
 
     public List<UserBookDTO> getUserBooks(User user) {
-        List<UserBook> userBooks = findUserBooks(user.getUser_id());
+        List<UserBook> userBooks = findUserBooks(user.getUserId());
 
         List<UserBookDTO> userBookDTOS = userBooks.stream()
                 .map(UserBookMapper::toUserBookDTO)
@@ -49,7 +49,7 @@ public class UserBookService {
     }
 
     public UserBookDTO addBookToUserBooks(User user, Long bookId) {
-        findUserBooks(user.getUser_id()).stream()
+        findUserBooks(user.getUserId()).stream()
                 .filter(userBook -> userBook.getBook().getBookId().equals(bookId))
                 .findFirst()
                 .ifPresent(s -> {throw new BookAlreadyExistException("Cannot add the same book twice");});
@@ -57,7 +57,7 @@ public class UserBookService {
         Book dbBook = bookService.findById(bookId);
 
         UserBook newUserBook = UserBook.builder()
-                .userId(user.getUser_id())
+                .userId(user.getUserId())
                 .book(dbBook)
                 .comments(new ArrayList<>())
                 .build();
@@ -66,7 +66,7 @@ public class UserBookService {
     }
 
     public void deleteUserBook(User user, Long userBookId) {
-        List<UserBook> userBooks = findUserBooks(user.getUser_id());
+        List<UserBook> userBooks = findUserBooks(user.getUserId());
 
         UserBook userBookToDelete = userBooks.stream()
                 .filter(userBook -> userBook.getUser_to_book_id().equals(userBookId))
@@ -82,7 +82,7 @@ public class UserBookService {
 
     public CommentDTO addCommentForUserAndBook(User user, Long userBookId, String comment){
         //TODO zmiana na userBookId
-        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
+        UserBook userBook = findUserBook(user.getUserId(), userBookId);
 
         Comment newComment = Comment.builder()
                 .userBookId(userBook.getUser_to_book_id())
@@ -104,7 +104,7 @@ public class UserBookService {
 
     public CommentDTO editComment(User user, Long userBookId, CommentDTO commentDTO) {
         //TODO zmiana na userBookId
-        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
+        UserBook userBook = findUserBook(user.getUserId(), userBookId);
 
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentDTO.getCommentId()))
@@ -125,7 +125,7 @@ public class UserBookService {
 
     public void deleteComment(User user, Long userBookId, Long commentId) {
         //TODO zmiana na userBookId
-        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
+        UserBook userBook = findUserBook(user.getUserId(), userBookId);
 
         Comment dbComment = userBook.getComments().stream()
                 .filter(comment -> comment.getComment_id().equals(commentId))
@@ -141,7 +141,7 @@ public class UserBookService {
 
     public void setUserScore(User user, Long userBookId, Integer newUserScore) {
         //TODO zmiana na userBookId
-        UserBook userBook = findUserBook(user.getUser_id(), userBookId);
+        UserBook userBook = findUserBook(user.getUserId(), userBookId);
 
         if(userBook.getUserRating() == null)
             addUserScore(userBook, newUserScore);
