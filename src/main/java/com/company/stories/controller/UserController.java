@@ -91,6 +91,16 @@ public class UserController {
         return userService.getUser(user);
     }
 
+    @Operation(summary = "Getting requested user info")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping(value = "/{userId}", produces = APPLICATION_JSON_VALUE)
+    public UserDTO getUserInfo(@PathVariable Long userId){
+        return userService.getUser(userId);
+    }
+
     @Operation(summary = "Granting role to user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
@@ -219,6 +229,16 @@ public class UserController {
         User issuer = getIssuer(request);
 
         return userBookService.getUserBooks(issuer);
+    }
+
+    @Operation(summary = "Getting list of requested user private books")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
+    @GetMapping(value = "/{userId}/books", produces = APPLICATION_JSON_VALUE)
+    public List<UserBookDTO> getUserBooks(@PathVariable Long userId){
+
+        return userBookService.getUserBooks(userId);
     }
 
     @Operation(summary = "Adding book to user private library")

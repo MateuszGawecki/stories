@@ -48,6 +48,16 @@ public class UserBookService {
         return userBookDTOS;
     }
 
+    public List<UserBookDTO> getUserBooks(Long userId) {
+        List<UserBook> userBooks = findUserBooks(userId);
+
+        List<UserBookDTO> userBookDTOS = userBooks.stream()
+                .map(UserBookMapper::toUserBookDTO)
+                .collect(Collectors.toList());
+
+        return userBookDTOS;
+    }
+
     public UserBookDTO addBookToUserBooks(User user, Long bookId) {
         findUserBooks(user.getUserId()).stream()
                 .filter(userBook -> userBook.getBook().getBookId().equals(bookId))

@@ -55,6 +55,11 @@ public class UserService implements UserDetailsService {
         return UserMapper.toUserDTO(user);
     }
 
+    public UserDTO getUser(Long userId) {
+        return UserMapper.toUserDTO(userRepository.findById(userId).orElseThrow(
+                () -> new UsernameNotFoundException(String.format("Cannot find user with id %d", userId))));
+    }
+
     public void assingRoleToUser(Long userId, String roleName) {
         User user = findUser(userId);
 
