@@ -150,27 +150,19 @@ public class UserBookService {
 
 
     public void setUserScore(User user, Long userBookId, Integer newUserScore) {
-        //TODO zmiana na userBookId
         UserBook userBook = findUserBook(user.getUserId(), userBookId);
 
-        if(userBook.getUserRating() == null)
+        if(userBook.getUserRating() == null){
+            if(newUserScore.equals(0))
+                return;
             addUserScore(userBook, newUserScore);
-        else
+        }
+        else {
+            if(newUserScore.equals(0)) {
+                resetUserScore(userBook, userBook.getUserRating());
+            }
             editUserScore(userBook, userBook.getUserRating(), newUserScore);
-    }
-
-    private UserBook findUserBook(Long userId, Long userBookId){
-        UserBook userBook = userBookRepository.findById(userBookId)
-                .orElseThrow(() -> new BookNotFoundException("User Book not found"));
-
-        if(userBook.getUserId().equals(userId))
-            return userBook;
-        else
-            throw new BookNotFoundException("Book not found in private library");
-    }
-
-    private List<UserBook> findUserBooks(Long userId){
-        return userBookRepository.findByUserId(userId);
+        }
     }
 
     private void addUserScore(UserBook userBook, Integer userScore) {
@@ -199,6 +191,41 @@ public class UserBookService {
         userBook.setUserRating(newUserScore);
 
         userBookRepository.saveAndFlush(userBook);
+    }
+
+    private void resetUserScore(UserBook userBook, Integer oldUserScore) {
+        Book book = userBook.getBook();
+        Float score = book.getGlobal_score();
+        Integer votes = book.getVotes();
+        int newVotes = votes - 1;
+
+        Float newScore;
+
+        if(newVotes == 0){
+            newScore = 0.0F;
+        }else {
+            newScore = (((score * votes) - oldUserScore)) / newVotes;
+        }
+
+        book.setGlobal_score(newScore);
+        book.setVotes(newVotes);
+        userBook.setUserRating(null);
+
+        userBookRepository.saveAndFlush(userBook);
+    }
+
+    private UserBook findUserBook(Long userId, Long userBookId){
+        UserBook userBook = userBookRepository.findById(userBookId)
+                .orElseThrow(() -> new BookNotFoundException("User Book not found"));
+
+        if(userBook.getUserId().equals(userId))
+            return userBook;
+        else
+            throw new BookNotFoundException("Book not found in private library");
+    }
+
+    private List<UserBook> findUserBooks(Long userId){
+        return userBookRepository.findByUserId(userId);
     }
 
     public List<BookDTO> getRecommendedForUser(User user) {

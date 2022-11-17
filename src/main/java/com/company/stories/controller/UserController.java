@@ -220,6 +220,17 @@ public class UserController {
         userService.removeFriendForUser(issuer, friendId);
     }
 
+    @Operation(summary = "Check if user is friend of issuer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping(value = "/friends/{userId}", produces = APPLICATION_JSON_VALUE)
+    public boolean isFriend(HttpServletRequest request, @PathVariable Long userId){
+        User issuer = getIssuer(request);
+        return userService.isFriendOfIssuer(issuer, userId);
+    }
+
     @Operation(summary = "Getting list of private books")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200")

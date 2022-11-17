@@ -262,4 +262,13 @@ public class UserService implements UserDetailsService {
     public UserDTO updateUser(User issuer) {
         return UserMapper.toUserDTO(userRepository.save(issuer));
     }
+
+    public boolean isFriendOfIssuer(User issuer, Long userId) {
+        Optional<User> friend = issuer.getFriends()
+                .stream()
+                .filter(friend1 -> friend1.getUserId().equals(userId))
+                .findAny();
+
+        return friend.isPresent();
+    }
 }
