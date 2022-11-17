@@ -76,12 +76,9 @@ public class UserBookService {
     }
 
     public void deleteUserBook(User user, Long userBookId) {
-        List<UserBook> userBooks = findUserBooks(user.getUserId());
+        UserBook userBookToDelete = findUserBook(user.getUserId(), userBookId);
 
-        UserBook userBookToDelete = userBooks.stream()
-                .filter(userBook -> userBook.getUser_to_book_id().equals(userBookId))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException("Book not found in private library"));
+        resetUserScore(userBookToDelete, userBookToDelete.getUserRating());
 
         userBookToDelete.getComments().forEach(comment -> commentRepository.deleteById(comment.getComment_id()));
 
