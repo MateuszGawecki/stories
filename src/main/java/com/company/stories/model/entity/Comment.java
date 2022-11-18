@@ -33,4 +33,7 @@ public class Comment {
     Long userBookId;
 
     String comment;
+
+    @Column(name = "is_public")
+    Boolean isPublic;
 }

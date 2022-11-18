@@ -11,6 +11,7 @@ public abstract class CommentMapper {
         return Comment.builder()
                 .comment_id(commentDTO.getCommentId())
                 .comment(commentDTO.getComment())
+                .isPublic(commentDTO.getIsPublic())
                 .build();
     }
 
@@ -18,6 +19,7 @@ public abstract class CommentMapper {
         return CommentDTO.builder()
                 .commentId(comment.getComment_id())
                 .comment(comment.getComment())
+                .isPublic(comment.getIsPublic())
                 .build();
     }
 }

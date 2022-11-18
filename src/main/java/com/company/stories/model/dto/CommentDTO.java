@@ -16,4 +16,7 @@ public class CommentDTO {
 
     @Schema(name = "comment", description = "Unique comment message", example = "Excellent book")
     String comment;
+
+    @Schema(name = "isPublic", description = "Defines if other users can see this comment", example = "true")
+    Boolean isPublic;
 }

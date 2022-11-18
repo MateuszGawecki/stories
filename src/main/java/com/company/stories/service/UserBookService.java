@@ -55,6 +55,12 @@ public class UserBookService {
                 .map(UserBookMapper::toUserBookDTO)
                 .collect(Collectors.toList());
 
+        userBookDTOS.forEach(
+                userBookDTO -> userBookDTO.setCommentDTOs(
+                        userBookDTO.getCommentDTOs().stream()
+                                .filter(CommentDTO::getIsPublic)
+                                .collect(Collectors.toList())));
+
         return userBookDTOS;
     }
 
@@ -119,6 +125,7 @@ public class UserBookService {
                 .orElseThrow(() -> new CommentNotFoundException("Comment not exist"));
 
         dbComment.setComment(commentDTO.getComment());
+        dbComment.setIsPublic(commentDTO.getIsPublic());
 
         UserBook updatedUserBook = userBookRepository.saveAndFlush(userBook);
 
