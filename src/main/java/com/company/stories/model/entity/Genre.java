@@ -20,8 +20,8 @@ import javax.persistence.Table;
 public class Genre {
 
     @Id
-    @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="genre_id_seq", allocationSize=1)
+    @GeneratedValue(generator="my_seq_genre")
+    @SequenceGenerator(name="my_seq_genre",sequenceName="genre_id_seq", allocationSize=1)
     Long genre_id;
 
     String name;

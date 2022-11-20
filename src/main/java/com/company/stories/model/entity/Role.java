@@ -23,8 +23,8 @@ import javax.persistence.Table;
 public class Role {
 
     @Id
-    @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="role_pk_seq", allocationSize=1)
+    @GeneratedValue(generator="my_seq_role")
+    @SequenceGenerator(name="my_seq_role",sequenceName="role_id_seq", allocationSize=1)
     Long role_id;
 
     @EqualsAndHashCode.Include

@@ -25,8 +25,8 @@ import javax.persistence.Table;
 public class Comment {
 
     @Id
-    @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="comment_id_seq", allocationSize=1)
+    @GeneratedValue(generator="my_seq_comment")
+    @SequenceGenerator(name="my_seq_comment",sequenceName="comment_id_seq", allocationSize=1)
     Long comment_id;
 
     @Column(name = "user_to_book_id")

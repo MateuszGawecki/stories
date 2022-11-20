@@ -28,8 +28,8 @@ import java.util.Set;
 public class Book {
 
     @Id
-    @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="book_id_seq", allocationSize=1)
+    @GeneratedValue(generator="my_seq_book")
+    @SequenceGenerator(name="my_seq_book",sequenceName="book_id_seq", allocationSize=1)
     @Column(name = "book_id")
     Long bookId;
 

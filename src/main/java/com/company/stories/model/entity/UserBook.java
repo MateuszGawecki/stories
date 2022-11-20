@@ -27,8 +27,8 @@ import java.util.List;
 public class UserBook {
 
     @Id
-    @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="user_to_book_id_seq", allocationSize=1)
+    @GeneratedValue(generator="my_seq_user_to_book")
+    @SequenceGenerator(name="my_seq_user_to_book",sequenceName="user_to_book_id_seq", allocationSize=1)
     Long user_to_book_id;
 
     @Column(name = "user_id")

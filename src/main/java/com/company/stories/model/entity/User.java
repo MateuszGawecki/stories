@@ -30,8 +30,8 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(generator="my_seq")
-    @SequenceGenerator(name="my_seq",sequenceName="user_pk_seq", allocationSize=1)
+    @GeneratedValue(generator="my_seq_user")
+    @SequenceGenerator(name="my_seq_user",sequenceName="user_id_seq", allocationSize=1)
     @Column(name = "user_id")
     Long userId;
 
