@@ -5,6 +5,7 @@ import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.dto.UserRegistrationDTO;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
+import com.company.stories.service.LogService;
 import com.company.stories.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,17 +15,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -49,9 +46,11 @@ public class SecurityController {
     private static final String REFRESH_TOKEN_ID = "refresh_token";
 
     private final UserService userService;
+    private final LogService logService;
 
-    public SecurityController(UserService userService) {
+    public SecurityController(UserService userService, LogService logService) {
         this.userService = userService;
+        this.logService = logService;
     }
 
 
@@ -67,6 +66,13 @@ public class SecurityController {
                 user.getEmail()
         );
 
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt password change",
+                        issuer
+                )
+        );
+
         userService.changeUserPassword(user, passChangeDTO.getOldPassword(), passChangeDTO.getNewPassword());
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -77,16 +83,9 @@ public class SecurityController {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO){
-        UserDTO  userDTO = userRegistrationDTO.getUserDTO();
-        log.info("Register attempt performed by user {} {} with email: {}",
-                userDTO.getName(),
-                userDTO.getSurname(),
-                userDTO.getEmail()
-        );
-
         UserDTO user = userService.saveNewUser(userRegistrationDTO);
 
-        return new ResponseEntity<UserDTO>(user, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Operation(summary = "Refreshing access token with refresh token")

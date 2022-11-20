@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,6 +26,15 @@ public class ImageService {
         Path filePath = Paths.get(IMAGE_FOLDER_PATH + newName);
         image.transferTo(filePath);
         return newName;
+    }
+
+    public String replaceImage(MultipartFile image, String imageName) throws IOException {
+        String fileName = IMAGE_FOLDER_PATH + imageName;
+        log.error(fileName);
+        File f = new File(fileName);
+        var x = f.delete();
+        log.error("" + x);
+        return saveImage(image);
     }
 
     public byte[] findImage(String imageName) {

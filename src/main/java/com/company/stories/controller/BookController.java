@@ -1,12 +1,14 @@
 package com.company.stories.controller;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.company.stories.model.dto.BookDTO;
+import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.BookService;
+import com.company.stories.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,10 +40,12 @@ import java.util.Map;
 @Tag(name = "Books", description = "Endpoints for managing books")
 public class BookController {
     private final BookService bookService;
+    private final LogService logService;
 
     @Autowired
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, LogService logService) {
         this.bookService = bookService;
+        this.logService = logService;
     }
 
     @Operation(summary = "Creating new book")
@@ -49,8 +54,16 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Book already exist")
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public BookDTO createBook(@RequestBody BookDTO bookDTO) {
+    public BookDTO createBook(HttpServletRequest request, @RequestBody BookDTO bookDTO) {
         log.info("Creating book: {}", bookDTO.getTitle());
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to create book %s",
+                        issuer,
+                        bookDTO.getTitle()
+                )
+        );
+
         return bookService.createBook(bookDTO);
     }
 
@@ -60,8 +73,15 @@ public class BookController {
             @ApiResponse(responseCode = "404", description = "Book not found")
     })
     @PutMapping
-    public BookDTO editBook(@RequestBody BookDTO bookDTO) {
+    public BookDTO editBook(HttpServletRequest request, @RequestBody BookDTO bookDTO) {
         log.info("Editing book: {}", bookDTO.getTitle());
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to edit book with id %d",
+                        issuer,
+                        bookDTO.getBookId()
+                )
+        );
 
         return bookService.editBook(bookDTO);
     }
@@ -72,8 +92,15 @@ public class BookController {
             @ApiResponse(responseCode = "404", description = "Book not found")
     })
     @DeleteMapping(value = "/{bookId}")
-    public void deleteBook(@PathVariable Long bookId){
+    public void deleteBook(HttpServletRequest request, @PathVariable Long bookId){
         log.info("Deleting book: {}", bookId);
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to delete book with id %d",
+                        issuer,
+                        bookId
+                )
+        );
 
         bookService.deleteBook(bookId);
     }

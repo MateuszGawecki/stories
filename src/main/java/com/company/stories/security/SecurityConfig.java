@@ -2,6 +2,7 @@ package com.company.stories.security;
 
 import com.company.stories.security.filter.CustomAuthenticationFilter;
 import com.company.stories.security.filter.CustomAuthorizationFilter;
+import com.company.stories.service.LogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final LogService logService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -63,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), logService);
         customAuthenticationFilter.setFilterProcessesUrl("/api/login"); //ta linia psuje działanie przy ustawieniu path w properties
         http.cors(Customizer.withDefaults());
         http.csrf().disable();

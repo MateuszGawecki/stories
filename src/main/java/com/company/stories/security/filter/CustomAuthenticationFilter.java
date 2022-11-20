@@ -1,6 +1,7 @@
 package com.company.stories.security.filter;
 
 import com.company.stories.security.SecurityUtils;
+import com.company.stories.service.LogService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -31,9 +32,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     private static final String REFRESH_TOKEN_ID = "refresh_token";
 
     private final AuthenticationManager authenticationManager;
+    private final LogService logService;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager){
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, LogService logService){
         this.authenticationManager = authenticationManager;
+        this.logService = logService;
     }
 
     @Override
@@ -46,14 +49,15 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        log.error("Authentication attempt performed by user {} failed", request.getParameter(USERNAME_PARAM_NAME));
+        log.info("Authentication attempt performed by user {} failed", request.getParameter(USERNAME_PARAM_NAME));
+        logService.saveLog(String.format("Authentication attempt performed by user %s failed", request.getParameter(USERNAME_PARAM_NAME)));
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        log.error("Authentication attempt performed by user {} succeed", request.getParameter(USERNAME_PARAM_NAME));
+        log.info("Authentication attempt performed by user {} succeed", request.getParameter(USERNAME_PARAM_NAME));
 
         User user = (User) authResult.getPrincipal();
 

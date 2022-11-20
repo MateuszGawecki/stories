@@ -34,9 +34,12 @@ public class ImageController {
             @ApiResponse(responseCode = "200")
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public String uploadImage(@RequestParam MultipartFile image) throws IOException {
+    public String uploadImage(@RequestParam MultipartFile image, @RequestParam(required = false) String imageName) throws IOException {
         log.info("Saving image");
-        return imageService.saveImage(image);
+        if(imageName != null)
+            return imageService.replaceImage(image, imageName);
+        else
+            return imageService.saveImage(image);
     }
 
     @Operation(summary = "Get image by it's name")

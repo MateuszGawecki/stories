@@ -1,13 +1,15 @@
 package com.company.stories.controller;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.company.stories.model.dto.AuthorDTO;
+import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.AuthorService;
+import com.company.stories.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -25,9 +28,11 @@ import java.util.List;
 @Tag(name = "Authors", description = "Endpoints for managing authors")
 public class AuthorController {
     private final AuthorService authorService;
+    private final LogService logService;
 
-    public AuthorController(AuthorService authorService) {
+    public AuthorController(AuthorService authorService, LogService logService) {
         this.authorService = authorService;
+        this.logService = logService;
     }
 
     @Operation(summary = "Getting list of all users")
@@ -45,7 +50,15 @@ public class AuthorController {
             @ApiResponse(responseCode = "400", description = "Author already exist")
     })
     @PostMapping
-    public AuthorDTO createAuthor(@RequestBody AuthorDTO authorDTO){
+    public AuthorDTO createAuthor(HttpServletRequest request, @RequestBody AuthorDTO authorDTO){
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to create author %s",
+                        issuer,
+                        authorDTO.getAuthorName() + authorDTO.getAuthorSurname()
+                )
+        );
+
         return authorService.createAuthor(authorDTO);
     }
 
@@ -55,7 +68,14 @@ public class AuthorController {
             @ApiResponse(responseCode = "404", description = "Author not found")
     })
     @DeleteMapping("/{authorId}")
-    public void deleteAuthor(@PathVariable Long authorId){
+    public void deleteAuthor(HttpServletRequest request, @PathVariable Long authorId){
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to delete author with id %d",
+                        issuer,
+                        authorId
+                )
+        );
         authorService.deleteAuthor(authorId);
     }
 
@@ -65,7 +85,15 @@ public class AuthorController {
             @ApiResponse(responseCode = "404", description = "Author not found")
     })
     @PutMapping
-    public AuthorDTO editAuthor(@RequestBody AuthorDTO authorDTO){
+    public AuthorDTO editAuthor(HttpServletRequest request, @RequestBody AuthorDTO authorDTO){
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to edit author with id %d",
+                        issuer,
+                        authorDTO.getAuthorId()
+                )
+        );
+
         return authorService.updateAuthor(authorDTO);
     }
 }

@@ -7,6 +7,7 @@ import com.company.stories.model.dto.UserBookDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
+import com.company.stories.service.LogService;
 import com.company.stories.service.UserBookService;
 import com.company.stories.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +30,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -49,11 +47,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class UserController {
     private final UserService userService;
     private final UserBookService userBookService;
+    private final LogService logService;
 
     @Autowired
-    public UserController(UserService userService, UserBookService userBookService) {
+    public UserController(UserService userService, UserBookService userBookService, LogService logService) {
         this.userService = userService;
         this.userBookService = userBookService;
+        this.logService = logService;
     }
 
     //TODO change user name, surname, imagePath
@@ -69,6 +69,11 @@ public class UserController {
                                 @RequestParam(required = false) String surname,
                                 @RequestParam(required = false) String imagePath){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to edit his data",
+                        issuer.getEmail()
+                )
+        );
 
         if(name != null)
             issuer.setName(name);
@@ -107,7 +112,15 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User or role not found")
     })
     @PostMapping("/roles/{userId}/{roleName}")
-    public void grantRoleToUser(@PathVariable Long userId, @PathVariable String roleName){
+    public void grantRoleToUser(HttpServletRequest request, @PathVariable Long userId, @PathVariable String roleName){
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to grant role %s to user with id %d",
+                        issuer,
+                        roleName,
+                        userId
+                )
+        );
         userService.assingRoleToUser(userId, roleName);
     }
 
@@ -117,7 +130,15 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User or role not found")
     })
     @DeleteMapping(value = "/roles/{userId}/{roleName}")
-    public void revokeRoleFromUser(@PathVariable Long userId, @PathVariable String roleName){
+    public void revokeRoleFromUser(HttpServletRequest request, @PathVariable Long userId, @PathVariable String roleName){
+        String issuer = ControllerUtils.getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to revoke role %s from user with id %d",
+                        issuer,
+                        roleName,
+                        userId
+                )
+        );
         userService.revokeRoleFromUser(userId, roleName);
     }
 
@@ -206,6 +227,12 @@ public class UserController {
     @PostMapping(value = "/friends/{friendId}")
     public void addFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to add friend with id %d",
+                        issuer.getEmail(),
+                        friendId
+                )
+        );
         userService.addFriendForUser(issuer, friendId);
     }
 
@@ -217,6 +244,12 @@ public class UserController {
     @DeleteMapping(value = "/friends/{friendId}")
     public void removeFriendForUser(HttpServletRequest request, @PathVariable Long friendId){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to remove friend with id %d",
+                        issuer.getEmail(),
+                        friendId
+                )
+        );
         userService.removeFriendForUser(issuer, friendId);
     }
 
@@ -261,6 +294,12 @@ public class UserController {
     @PostMapping(value = "/books/{bookId}", produces = APPLICATION_JSON_VALUE)
     public UserBookDTO addBookToUserBooks(HttpServletRequest request, @PathVariable Long bookId){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to add book with id %d to private library ",
+                        issuer.getEmail(),
+                        bookId
+                )
+        );
 
         return userBookService.addBookToUserBooks(issuer, bookId);
     }
@@ -273,6 +312,12 @@ public class UserController {
     @DeleteMapping(value = "/books/{userBookId}")
     public void deleteUserBook(HttpServletRequest request, @PathVariable Long userBookId){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to delete user_book with id %d from private library",
+                        issuer.getEmail(),
+                        userBookId
+                )
+        );
 
         userBookService.deleteUserBook(issuer, userBookId);
     }
@@ -285,6 +330,13 @@ public class UserController {
     @PostMapping(value = "/books/{userBookId}/comments")
     public CommentDTO addCommentToBook(HttpServletRequest request, @PathVariable Long userBookId, @RequestBody String comment){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to add comment: %s to user_book with id %d",
+                        issuer.getEmail(),
+                        comment,
+                        userBookId
+                )
+        );
         log.info("Adding comment " + comment);
 
         return userBookService.addCommentForUserAndBook(issuer, userBookId, comment);
@@ -298,6 +350,13 @@ public class UserController {
     @PutMapping(value = "/books/{userBookId}/comments")
     public CommentDTO editComment(HttpServletRequest request, @PathVariable Long userBookId, @RequestBody  CommentDTO commentDTO){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to edit comment with id %d to user_book with id %d",
+                        issuer.getEmail(),
+                        commentDTO.getCommentId(),
+                        userBookId
+                )
+        );
 
         return userBookService.editComment(issuer, userBookId, commentDTO);
     }
@@ -310,7 +369,13 @@ public class UserController {
     @DeleteMapping(value = "/books/{userBookId}/comments/{commentId}")
     public void deleteComment(HttpServletRequest request, @PathVariable Long userBookId, @PathVariable Long commentId){
         User issuer = getIssuer(request);
-
+        logService.saveLog(
+                String.format("User %s attempt to delete comment with id %d to user_book with id %d",
+                        issuer.getEmail(),
+                        commentId,
+                        userBookId
+                )
+        );
         userBookService.deleteComment(issuer, userBookId, commentId);
     }
 
@@ -321,6 +386,12 @@ public class UserController {
     @PostMapping(value = "/books/{userBookId}/score/{userScore}")
     public void setUserScore(HttpServletRequest request, @PathVariable Long userBookId, @PathVariable Integer userScore){
         User issuer = getIssuer(request);
+        logService.saveLog(
+                String.format("User %s attempt to edit user rating on user_book with id %d",
+                        issuer.getEmail(),
+                        userBookId
+                )
+        );
 
         userBookService.setUserScore(issuer, userBookId, userScore);
     }
