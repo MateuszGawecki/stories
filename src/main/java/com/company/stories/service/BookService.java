@@ -3,10 +3,13 @@ package com.company.stories.service;
 import com.company.stories.exception.OperationNotPermittedException;
 import com.company.stories.exception.book.BookAlreadyExistException;
 import com.company.stories.exception.book.BookNotFoundException;
+import com.company.stories.exception.book.CannotCreateOrModifyBookException;
 import com.company.stories.model.dto.AuthorDTO;
 import com.company.stories.model.dto.BookDTO;
+import com.company.stories.model.dto.GenreDTO;
 import com.company.stories.model.entity.Author;
 import com.company.stories.model.entity.Book;
+import com.company.stories.model.entity.Genre;
 import com.company.stories.model.mapper.AuthorMapper;
 import com.company.stories.model.mapper.BookMapper;
 import com.company.stories.model.mapper.GenreMapper;
@@ -34,11 +37,13 @@ import java.util.stream.Collectors;
 public class BookService {
     private final BookRepository bookRepository;
     private final AuthorService authorService;
+    private final GenreService genreService;
 
     @Autowired
-    public BookService(BookRepository bookRepository, AuthorService authorService) {
+    public BookService(BookRepository bookRepository, AuthorService authorService, GenreService genreService) {
         this.bookRepository = bookRepository;
         this.authorService = authorService;
+        this.genreService = genreService;
     }
 
     public BookDTO createBook(BookDTO bookDTO) {
@@ -57,11 +62,21 @@ public class BookService {
             }
         }
 
+        Set<Genre> genres = new HashSet<>();
+
+        if(bookDTO.getGenres() != null && !bookDTO.getGenres().isEmpty()){
+            for (GenreDTO genreDTO: bookDTO.getGenres()) {
+                Genre genre = genreService.findGenreByName(genreDTO.getName());
+                genres.add(genre);
+            }
+        }
+
         Book book = Book.builder()
                 .title(bookDTO.getTitle())
                 .description(bookDTO.getDescription())
                 .image_path(bookDTO.getImagePath())
                 .authors(authors)
+                .genres(genres)
                 .global_score(bookDTO.getGlobalScore())
                 .votes(bookDTO.getVotes())
                 .build();
@@ -70,9 +85,7 @@ public class BookService {
             Book dbBook1 = bookRepository.saveAndFlush(book);
             return BookMapper.toBookDTO(dbBook1);
         } catch (Exception ex){
-            //TODO ten catch jest chuja wart
-            log.error("line 66" + ex.getMessage());
-            return null;
+            throw new CannotCreateOrModifyBookException(ex.getMessage());
         }
     }
 
@@ -95,8 +108,7 @@ public class BookService {
             Book dbBook1 = bookRepository.saveAndFlush(newBook);
             return BookMapper.toBookDTO(dbBook1);
         } catch (Exception ex){
-            log.error(ex.getMessage());
-            throw new RuntimeException();
+            throw new CannotCreateOrModifyBookException(ex.getMessage());
         }
     }
 

@@ -32,7 +32,7 @@ public class GenreService {
         return genreDTOS;
     }
 
-    public Genre findGenreByNameAndSurname(String name, String surname){
+    public Genre findGenreByName(String name){
         Optional<Genre> genre = genreRepository.findByName(name);
 
         if(genre.isEmpty()){
