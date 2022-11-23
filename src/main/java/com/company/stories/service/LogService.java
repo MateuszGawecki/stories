@@ -1,11 +1,8 @@
 package com.company.stories.service;
 
 import com.company.stories.model.dto.LogDTO;
-import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.Log;
-import com.company.stories.model.entity.User;
 import com.company.stories.model.mapper.LogMapper;
-import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -58,6 +55,30 @@ public class LogService {
 
     public Map<String, Object> getByMessageAndDateBetween(String msg, LocalDateTime start, LocalDateTime end, Pageable pageable) {
         Page<Log> page = logRepository.findByLogMessageContainingIgnoreCaseAndDateBetween(msg, start, end, pageable);
+
+        return getPageOfLogs(page);
+    }
+
+    public Map<String, Object> getByMessageAndDateAfter(String msg, LocalDateTime start, Pageable pageable) {
+        Page<Log> page = logRepository.findByLogMessageContainingIgnoreCaseAndDateAfter(msg, start, pageable);
+
+        return getPageOfLogs(page);
+    }
+
+    public Map<String, Object> getByMessageAndDateBefore(String msg, LocalDateTime end, Pageable pageable) {
+        Page<Log> page = logRepository.findByLogMessageContainingIgnoreCaseAndDateBefore(msg, end, pageable);
+
+        return getPageOfLogs(page);
+    }
+
+    public Map<String, Object> getByDateAfter(LocalDateTime start, Pageable pageable) {
+        Page<Log> page = logRepository.findByDateAfter(start, pageable);
+
+        return getPageOfLogs(page);
+    }
+
+    public Map<String, Object> getByDateBefore(LocalDateTime end, Pageable pageable) {
+        Page<Log> page = logRepository.findByDateBefore(end, pageable);
 
         return getPageOfLogs(page);
     }

@@ -123,7 +123,7 @@ public class BookController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getBooks(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "60") int size,
+            @RequestParam(defaultValue = "30") int size,
             @RequestParam(defaultValue = "bookId,desc") String[] sort,
             @RequestParam(required = false) String searchParameter,
             @RequestParam(required = false) String searchValue){

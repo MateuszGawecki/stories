@@ -149,7 +149,7 @@ public class UserController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "60") int size,
+            @RequestParam(defaultValue = "30") int size,
             @RequestParam(defaultValue = "userId,desc") String[] sort,
             @RequestParam(required = false) String searchValue
     ){

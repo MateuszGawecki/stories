@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
@@ -72,8 +73,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/**").hasAnyAuthority("user");
+        http.authorizeRequests().antMatchers( POST, "/api/image/**").hasAnyAuthority("user");
         http.authorizeRequests().antMatchers(DELETE, "/api/user/friends/remove/**").hasAnyAuthority("user");
-        http.authorizeRequests().antMatchers("/api/image/**", "/api/book/**").hasAnyAuthority("moderator");
+        http.authorizeRequests().antMatchers( "/api/book/**").hasAnyAuthority("moderator");
         http.authorizeRequests().antMatchers("/api/user/role/**").hasAnyAuthority("admin");
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);

@@ -9,7 +9,7 @@ public abstract class LogMapper {
 
     public static LogDTO toLogDTO(Log log){
         return LogDTO.builder()
-                .logId(log.getLog_id())
+                .logId(log.getLogId())
                 .logMessage(log.getLogMessage())
                 .date(log.getDate())
                 .build();

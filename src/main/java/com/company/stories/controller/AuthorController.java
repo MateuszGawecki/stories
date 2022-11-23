@@ -1,8 +1,6 @@
 package com.company.stories.controller;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.company.stories.model.dto.AuthorDTO;
-import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.AuthorService;
 import com.company.stories.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +53,7 @@ public class AuthorController {
         logService.saveLog(
                 String.format("User %s attempt to create author %s",
                         issuer,
-                        authorDTO.getAuthorName() + authorDTO.getAuthorSurname()
+                        authorDTO.getAuthorName() + " " + authorDTO.getAuthorSurname()
                 )
         );
 

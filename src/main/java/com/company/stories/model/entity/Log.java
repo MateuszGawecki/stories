@@ -23,7 +23,8 @@ public class Log {
     @Id
     @GeneratedValue(generator="my_seq_log")
     @SequenceGenerator(name="my_seq_log",sequenceName="log_id_seq", allocationSize=1)
-    Long log_id;
+    @Column(name = "log_Id")
+    Long logId;
 
     @Column(name = "log_message")
     String logMessage;

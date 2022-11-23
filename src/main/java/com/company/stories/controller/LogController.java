@@ -1,6 +1,7 @@
 package com.company.stories.controller;
 
 import com.company.stories.service.LogService;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,7 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Logs", description = "Endpoints for managing logs")
 public class LogController {
     private final LogService logService;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Autowired
     public LogController(LogService logService) {
@@ -44,12 +50,12 @@ public class LogController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getLogs(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size,
-            @RequestParam(defaultValue = "userId,desc") String[] sort,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(defaultValue = "logId,desc") String[] sort,
             @RequestParam(required = false) String msg,
-            @RequestParam(required = false) LocalDateTime start,
-            @RequestParam(required = false) LocalDateTime end
-            ){
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end
+            ) throws ParseException {
 
         try {
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
@@ -71,11 +77,35 @@ public class LogController {
             Map<String, Object> response;
 
             if(msg != null && start != null && end != null){
-                response = logService.getByMessageAndDateBetween(msg, start, end, pagingSort);
-            }else if(msg != null){
-                response = logService.getByMessage(msg, pagingSort);
+                String dateTimeStartStr = start.replace("T", " ");
+                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
+                String dateTimeEdnStr = end.replace("T", " ");
+                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+                response = logService.getByMessageAndDateBetween(msg, startDate, endDate, pagingSort);
+            } else if(msg != null && start!= null){
+                String dateTimeStartStr = start.replace("T", " ");
+                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
+                response = logService.getByMessageAndDateAfter(msg, startDate, pagingSort);
+            } else if(msg != null && end!= null){
+                String dateTimeEdnStr = end.replace("T", " ");
+                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+                response = logService.getByMessageAndDateBefore(msg, endDate, pagingSort);
             } else if(start != null && end !=null){
-                response = logService.getByDateBetween(start, end, pagingSort);
+                String dateTimeStartStr = start.replace("T", " ");
+                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
+                String dateTimeEdnStr = end.replace("T", " ");
+                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+                response = logService.getByDateBetween(startDate, endDate, pagingSort);
+            } else if(msg != null) {
+                response = logService.getByMessage(msg, pagingSort);
+            } else if(start != null) {
+                String dateTimeStartStr = start.replace("T", " ");
+                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
+                response = logService.getByDateAfter(startDate, pagingSort);
+            } else if(end != null) {
+                String dateTimeEdnStr = end.replace("T", " ");
+                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+                response = logService.getByDateBefore(endDate, pagingSort);
             } else {
                 response = logService.getAllLogs(pagingSort);
             }

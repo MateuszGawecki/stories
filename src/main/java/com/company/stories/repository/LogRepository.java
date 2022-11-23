@@ -20,4 +20,12 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     Page<Log> findByDateBetween(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
     Page<Log> findByLogMessageContainingIgnoreCaseAndDateBetween(String msg, LocalDateTime from, LocalDateTime to, Pageable pageable);
+
+    Page<Log> findByLogMessageContainingIgnoreCaseAndDateAfter(String msg, LocalDateTime start, Pageable pageable);
+
+    Page<Log> findByLogMessageContainingIgnoreCaseAndDateBefore(String msg, LocalDateTime end, Pageable pageable);
+
+    Page<Log> findByDateAfter(LocalDateTime start, Pageable pageable);
+
+    Page<Log> findByDateBefore(LocalDateTime end, Pageable pageable);
 }

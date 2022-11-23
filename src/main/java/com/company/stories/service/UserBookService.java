@@ -100,6 +100,7 @@ public class UserBookService {
         Comment newComment = Comment.builder()
                 .userBookId(userBook.getUser_to_book_id())
                 .comment(comment)
+                .isPublic(false)
                 .build();
 
         userBook.getComments().add(newComment);
