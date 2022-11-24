@@ -8,6 +8,7 @@ import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.LogService;
+import com.company.stories.service.RecommendationService;
 import com.company.stories.service.UserBookService;
 import com.company.stories.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,12 +48,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class UserController {
     private final UserService userService;
     private final UserBookService userBookService;
+    private final RecommendationService recommendationService;
     private final LogService logService;
 
     @Autowired
-    public UserController(UserService userService, UserBookService userBookService, LogService logService) {
+    public UserController(UserService userService, UserBookService userBookService, RecommendationService recommendationService, LogService logService) {
         this.userService = userService;
         this.userBookService = userBookService;
+        this.recommendationService = recommendationService;
         this.logService = logService;
     }
 
@@ -404,7 +407,7 @@ public class UserController {
     public List<BookDTO> getRecommended(HttpServletRequest request){
         User issuer = getIssuer(request);
 
-        return userBookService.getRecommendedForUser(issuer);
+        return recommendationService.getRecommendedForUser(issuer);
     }
 
 

@@ -1,7 +1,6 @@
 package com.company.stories.controller;
 
 import com.company.stories.service.LogService;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,13 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,35 +72,34 @@ public class LogController {
 
             Map<String, Object> response;
 
-            if(msg != null && start != null && end != null){
-                String dateTimeStartStr = start.replace("T", " ");
-                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
-                String dateTimeEdnStr = end.replace("T", " ");
-                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+            String dateTimeStartStr;
+            LocalDateTime startDate = null;
+            String dateTimeEdnStr;
+            LocalDateTime endDate = null;
+
+            if(start != null){
+                dateTimeStartStr = start.replace("T", " ");
+                startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
+            }
+
+            if(end != null){
+                dateTimeEdnStr = end.replace("T", " ");
+                endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+            }
+
+            if(msg != null && startDate != null && endDate != null){
                 response = logService.getByMessageAndDateBetween(msg, startDate, endDate, pagingSort);
-            } else if(msg != null && start!= null){
-                String dateTimeStartStr = start.replace("T", " ");
-                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
+            } else if(msg != null && startDate != null){
                 response = logService.getByMessageAndDateAfter(msg, startDate, pagingSort);
-            } else if(msg != null && end!= null){
-                String dateTimeEdnStr = end.replace("T", " ");
-                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+            } else if(msg != null && endDate!= null){
                 response = logService.getByMessageAndDateBefore(msg, endDate, pagingSort);
-            } else if(start != null && end !=null){
-                String dateTimeStartStr = start.replace("T", " ");
-                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
-                String dateTimeEdnStr = end.replace("T", " ");
-                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+            } else if(startDate != null && endDate !=null){
                 response = logService.getByDateBetween(startDate, endDate, pagingSort);
             } else if(msg != null) {
                 response = logService.getByMessage(msg, pagingSort);
-            } else if(start != null) {
-                String dateTimeStartStr = start.replace("T", " ");
-                LocalDateTime startDate = LocalDateTime.parse(dateTimeStartStr, formatter);
+            } else if(startDate != null) {
                 response = logService.getByDateAfter(startDate, pagingSort);
-            } else if(end != null) {
-                String dateTimeEdnStr = end.replace("T", " ");
-                LocalDateTime endDate = LocalDateTime.parse(dateTimeEdnStr, formatter);
+            } else if(endDate != null) {
                 response = logService.getByDateBefore(endDate, pagingSort);
             } else {
                 response = logService.getAllLogs(pagingSort);

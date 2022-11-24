@@ -64,6 +64,14 @@ public class UserBookService {
         return userBookDTOS;
     }
 
+    public List<UserBook> getUserBookEntities(User issuer) {
+        return findUserBooks(issuer.getUserId());
+    }
+
+    public List<UserBook> getUserBookEntities(Long userId) {
+        return findUserBooks(userId);
+    }
+
     public UserBookDTO addBookToUserBooks(User user, Long bookId) {
         findUserBooks(user.getUserId()).stream()
                 .filter(userBook -> userBook.getBook().getBookId().equals(bookId))
@@ -231,12 +239,5 @@ public class UserBookService {
 
     private List<UserBook> findUserBooks(Long userId){
         return userBookRepository.findByUserId(userId);
-    }
-
-    public List<BookDTO> getRecommendedForUser(User user) {
-        //TODO this is fake for now
-        log.error("Recom");
-
-        return bookService.get3Books();
     }
 }

@@ -123,6 +123,12 @@ public class UserService implements UserDetailsService {
         return friendsDTOs;
     }
 
+    public Set<User> getUserFriendEntities(Long userId){
+        User dbUser = findUser(userId);
+
+        return dbUser.getFriends();
+    }
+
     private User findUser(Long userId) {
         Optional<User> user = userRepository.findById(userId);
 
