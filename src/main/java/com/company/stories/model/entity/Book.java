@@ -3,6 +3,7 @@ package com.company.stories.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Data
 @Table(name="book", schema = "public")
@@ -31,6 +33,7 @@ public class Book {
     @GeneratedValue(generator="my_seq_book")
     @SequenceGenerator(name="my_seq_book",sequenceName="book_id_seq", allocationSize=1)
     @Column(name = "book_id")
+    @EqualsAndHashCode.Include
     Long bookId;
 
     String title;

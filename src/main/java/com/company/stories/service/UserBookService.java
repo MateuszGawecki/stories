@@ -92,7 +92,7 @@ public class UserBookService {
     public void deleteUserBook(User user, Long userBookId) {
         UserBook userBookToDelete = findUserBook(user.getUserId(), userBookId);
 
-        resetUserScore(userBookToDelete, userBookToDelete.getUserRating());
+        setUserScore(user, userBookId, 0);
 
         userBookToDelete.getComments().forEach(comment -> commentRepository.deleteById(comment.getComment_id()));
 
