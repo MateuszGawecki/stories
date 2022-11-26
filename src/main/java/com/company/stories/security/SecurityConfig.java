@@ -43,6 +43,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/security/register"
     };
 
+    private static final String[] USER_ALL_METHODS_WHITE_LIST = {
+            "/api/users/friends/**",
+            "/api/users/books/**"
+    };
+
+    private static final String[] MODERATOR_WHITE_LIST = {
+            "/api/books/**",
+            "/api/authors/**",
+            "/api/genres/**"
+    };
+
+    private static final String[] ADMIN_WHITE_LIST = {
+            "/api/users/**",
+            "/api/logs/**",
+            "/api/roles/**"
+    };
+
     private static final List<String> ALLOWED_ORIGINS = Arrays.asList(
             "http://127.0.0.1:3000/",
             "http://localhost:3000/"
@@ -67,17 +84,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), logService);
-        customAuthenticationFilter.setFilterProcessesUrl("/api/login"); //ta linia psuje działanie przy ustawieniu path w properties
+        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
         http.cors(Customizer.withDefaults());
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/**").hasAnyAuthority("user");
-        http.authorizeRequests().antMatchers( POST, "/api/image/**").hasAnyAuthority("user");
-        http.authorizeRequests().antMatchers(DELETE, "/api/user/friends/remove/**").hasAnyAuthority("user");
-        http.authorizeRequests().antMatchers( "/api/book/**").hasAnyAuthority("moderator");
-        http.authorizeRequests().antMatchers("/api/user/role/**").hasAnyAuthority("admin");
-        http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests().antMatchers(POST, "/api/image/**").hasAnyAuthority("user");
+        http.authorizeRequests().antMatchers(USER_ALL_METHODS_WHITE_LIST).hasAnyAuthority("user");
+        http.authorizeRequests().antMatchers(MODERATOR_WHITE_LIST).hasAnyAuthority("moderator");
+        http.authorizeRequests().antMatchers(ADMIN_WHITE_LIST).hasAnyAuthority("admin");
+        http.authorizeRequests().anyRequest().denyAll();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }

@@ -1,8 +1,6 @@
 package com.company.stories.controller;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.company.stories.model.dto.BookDTO;
-import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.BookService;
 import com.company.stories.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;

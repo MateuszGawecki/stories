@@ -114,7 +114,7 @@ public class UserController {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "404", description = "User or role not found")
     })
-    @PostMapping("/roles/{userId}/{roleName}")
+    @PostMapping("/{userId}/roles/{roleName}")
     public void grantRoleToUser(HttpServletRequest request, @PathVariable Long userId, @PathVariable String roleName){
         String issuer = ControllerUtils.getIssuer(request);
         logService.saveLog(
@@ -132,7 +132,7 @@ public class UserController {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "404", description = "User or role not found")
     })
-    @DeleteMapping(value = "/roles/{userId}/{roleName}")
+    @DeleteMapping(value = "/{userId}/roles/{roleName}")
     public void revokeRoleFromUser(HttpServletRequest request, @PathVariable Long userId, @PathVariable String roleName){
         String issuer = ControllerUtils.getIssuer(request);
         logService.saveLog(
