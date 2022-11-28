@@ -13,7 +13,7 @@ public class UserBookTest {
     private static final Long userId = 2L;
     private static final Long bookId = 3L;
     private static final String bookTitle = "Book1";
-    private static final Book book = Book.builder().book_id(bookId).title(bookTitle).build();
+    private static final Book book = Book.builder().bookId(bookId).title(bookTitle).build();
     private static final Integer userRating = 9;
     private static final List<Comment> comments = new ArrayList<>();
 

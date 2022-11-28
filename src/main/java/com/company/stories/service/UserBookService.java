@@ -181,12 +181,12 @@ public class UserBookService {
     private void addUserScore(UserBook userBook, Integer userScore) {
         Book book = userBook.getBook();
         Integer votes = book.getVotes();
-        Float score = book.getGlobal_score();
+        Float score = book.getGlobalScore();
 
         Integer newVotes = votes + 1;
         Float newScore = ((score * votes)  + userScore ) / (newVotes);
 
-        book.setGlobal_score(newScore);
+        book.setGlobalScore(newScore);
         book.setVotes(newVotes);
         userBook.setUserRating(userScore);
 
@@ -195,12 +195,12 @@ public class UserBookService {
 
     private void editUserScore(UserBook userBook, Integer oldUserScore, Integer newUserScore) {
         Book book = userBook.getBook();
-        Float score = book.getGlobal_score();
+        Float score = book.getGlobalScore();
         Integer votes = book.getVotes();
 
         Float newScore = (((score * votes) - oldUserScore) + newUserScore) / votes;
 
-        book.setGlobal_score(newScore);
+        book.setGlobalScore(newScore);
         userBook.setUserRating(newUserScore);
 
         userBookRepository.saveAndFlush(userBook);
@@ -208,7 +208,7 @@ public class UserBookService {
 
     private void resetUserScore(UserBook userBook, Integer oldUserScore) {
         Book book = userBook.getBook();
-        Float score = book.getGlobal_score();
+        Float score = book.getGlobalScore();
         Integer votes = book.getVotes();
         int newVotes = votes - 1;
 
@@ -220,7 +220,7 @@ public class UserBookService {
             newScore = (((score * votes) - oldUserScore)) / newVotes;
         }
 
-        book.setGlobal_score(newScore);
+        book.setGlobalScore(newScore);
         book.setVotes(newVotes);
         userBook.setUserRating(null);
 

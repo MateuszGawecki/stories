@@ -6,15 +6,13 @@ import com.company.stories.model.entity.Genre;
 import com.company.stories.model.entity.User;
 import com.company.stories.model.entity.UserBook;
 import com.company.stories.model.mapper.BookMapper;
-import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,7 @@ public class RecommendationService {
     private final UserService userService;
     private final UserBookService userBookService;
 
+    @Autowired
     public RecommendationService(UserService userService, UserBookService userBookService) {
         this.userService = userService;
         this.userBookService = userBookService;
@@ -38,25 +37,28 @@ public class RecommendationService {
 
         Set<User> userFriends = getUserFriends(issuer);
 
-        Map<Long, Set<Book>> userIdToPrivateLibrary = generateUserLibraryMap(userFriends);
+        Map<Long, Set<Book>> friendIdToPrivateLibrary = generateUserLibraryMap(userFriends);
 
-        // only if his library contains more book than intersection of his lib and user lib
-        Map<Long, Integer> userIdToMatchCount = getRankingOfMatches(userBooks, userIdToPrivateLibrary);
+        Map<Long, Integer> friendIdToMatchCount = getRankingOfMatches(userBooks, friendIdToPrivateLibrary);
 
-        if(userIdToMatchCount.isEmpty())
+        if(friendIdToMatchCount.isEmpty())
             return new ArrayList<>();
 
-        List<Long> userIdsSorted = getSortedIdsByMatchCount(userIdToMatchCount);
+        List<Long> userIdsSorted = getSortedIdsByMatchCount(friendIdToMatchCount);
 
-        Map<Book, Integer> booksWithPoints = getPotentialRecommendations(userBooks, userIdsSorted, userIdToPrivateLibrary);
+        Map<Book, Integer> booksWithPoints = getPotentialRecommendationsWithInitPoints(
+                userBooks,
+                userIdsSorted,
+                friendIdToPrivateLibrary
+        );
 
         Genre favGenre = getUserFavouriteGenre(userBooks);
 
-        //printMap(booksWithPoints);
+        printMap(booksWithPoints);
         addPointsForSameGenre(booksWithPoints, favGenre);
-        //printMap(booksWithPoints);
+        printMap(booksWithPoints);
         addPointsForGlobalScore(booksWithPoints);
-        //printMap(booksWithPoints);
+        printMap(booksWithPoints);
 
         return getFinalRecommended(booksWithPoints).stream()
                 .map(BookMapper::toBookDTO)
@@ -84,9 +86,8 @@ public class RecommendationService {
 
     private void addPointsForGlobalScore(Map<Book, Integer> booksWithPoints) {
         for (Map.Entry<Book, Integer> bookWithPoints : booksWithPoints.entrySet()) {
-            Float globalScore = bookWithPoints.getKey().getGlobal_score();
+            Float globalScore = bookWithPoints.getKey().getGlobalScore();
 
-            //TODO branie pod uwagę jak dużo osób oceniło?
             if(bookWithPoints.getKey().getVotes() < 20)
                 return;
 
@@ -117,7 +118,7 @@ public class RecommendationService {
         return bestGenre.map(Map.Entry::getKey).orElse(null);
     }
 
-    private Map<Book, Integer> getPotentialRecommendations(Set<Book> userBooks, List<Long> userIdsSorted, Map<Long, Set<Book>> userIdToPrivateLibrary) {
+    private Map<Book, Integer> getPotentialRecommendationsWithInitPoints(Set<Book> userBooks, List<Long> userIdsSorted, Map<Long, Set<Book>> userIdToPrivateLibrary) {
         Map<Book, Integer> booksNotInUserPrivateLibrary = new HashMap<>();
         int points = 10;
 
@@ -130,7 +131,6 @@ public class RecommendationService {
             Set<Book>  friendBooksNotInUserLibrary = new HashSet<>(userIdToPrivateLibrary.get(userId));
             friendBooksNotInUserLibrary.removeAll(userBooks);
 
-            //tu dalej
             for (Book book: friendBooksNotInUserLibrary) {
                 if(booksNotInUserPrivateLibrary.containsKey(book)){
                     int prevPoints = booksNotInUserPrivateLibrary.get(book);

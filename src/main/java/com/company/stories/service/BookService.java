@@ -74,10 +74,10 @@ public class BookService {
         Book book = Book.builder()
                 .title(bookDTO.getTitle())
                 .description(bookDTO.getDescription())
-                .image_path(bookDTO.getImagePath())
+                .imagePath(bookDTO.getImagePath())
                 .authors(authors)
                 .genres(genres)
-                .global_score(bookDTO.getGlobalScore())
+                .globalScore(bookDTO.getGlobalScore())
                 .votes(bookDTO.getVotes())
                 .build();
 
@@ -99,7 +99,7 @@ public class BookService {
 
         newBook.setTitle(bookDTO.getTitle());
         newBook.setDescription(bookDTO.getDescription());
-        newBook.setImage_path(bookDTO.getImagePath());
+        newBook.setImagePath(bookDTO.getImagePath());
         newBook.setAuthors(bookDTO.getAuthors().stream().map(AuthorMapper::toAuthorEntity).collect(Collectors.toSet()));
         newBook.setGenres(bookDTO.getGenres().stream().map(GenreMapper::toGenreEntity).collect(Collectors.toSet()));
 

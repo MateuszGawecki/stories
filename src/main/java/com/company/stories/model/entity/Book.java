@@ -28,7 +28,6 @@ import java.util.Set;
 @Data
 @Table(name="book", schema = "public")
 public class Book {
-
     @Id
     @GeneratedValue(generator="my_seq_book")
     @SequenceGenerator(name="my_seq_book",sequenceName="book_id_seq", allocationSize=1)
@@ -40,9 +39,11 @@ public class Book {
 
     String description;
 
-    String image_path;
+    @Column(name = "image_path")
+    String imagePath;
 
-    Float global_score;
+    @Column(name = "global_score")
+    Float globalScore;
 
     Integer votes;
 

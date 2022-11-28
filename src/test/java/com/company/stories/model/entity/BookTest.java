@@ -23,23 +23,23 @@ public class BookTest {
 
         //when
         Book book = Book.builder()
-                .book_id(bookId)
+                .bookId(bookId)
                 .title(title)
                 .description(description)
-                .image_path(image_path)
-                .global_score(global_score)
+                .imagePath(image_path)
+                .globalScore(global_score)
                 .votes(votes)
                 .authors(authors)
                 .genres(genres)
                 .build();
 
         //then
-        assertEquals(bookId, book.getBook_id());
+        assertEquals(bookId, book.getBookId());
         assertEquals(title, book.getTitle());
         assertEquals(description, book.getDescription());
-        assertEquals(image_path, book.getImage_path());
+        assertEquals(image_path, book.getImagePath());
         assertEquals(votes, book.getVotes());
-        assertEquals(global_score, book.getGlobal_score());
+        assertEquals(global_score, book.getGlobalScore());
     }
 
     @Test
@@ -49,11 +49,11 @@ public class BookTest {
         String newDesc = "Lorem 2";
 
         Book book = Book.builder()
-                .book_id(bookId)
+                .bookId(bookId)
                 .title(title)
                 .description(description)
-                .image_path(image_path)
-                .global_score(global_score)
+                .imagePath(image_path)
+                .globalScore(global_score)
                 .votes(votes)
                 .authors(authors)
                 .genres(genres)
@@ -65,7 +65,7 @@ public class BookTest {
         book.setDescription(newDesc);
 
         //then
-        assertEquals(bookId, book.getBook_id());
+        assertEquals(bookId, book.getBookId());
         assertEquals(newTitle, book.getTitle());
         assertEquals(newDesc, book.getDescription());
     }
