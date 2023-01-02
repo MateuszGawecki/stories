@@ -31,6 +31,10 @@ import static org.springframework.http.HttpMethod.POST;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private static final String USER = "user";
+    private static final String MODERATOR = "moderator";
+    private static final String ADMIN = "admin";
+
     private static final String[] AUTH_WHITE_LIST = {
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -41,6 +45,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/login",
             "/api/security/token/refresh",
             "/api/security/register"
+    };
+
+    private static final String[] USER_GET_METHOD_WHITE_LIST = {
+            "/api/users/**",
+            "/api/books/**",
+            "/api/images/**"
     };
 
     private static final String[] USER_ALL_METHODS_WHITE_LIST = {
@@ -89,11 +99,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
-        http.authorizeRequests().antMatchers(GET, "/api/**").hasAnyAuthority("user");
-        http.authorizeRequests().antMatchers(POST, "/api/image/**").hasAnyAuthority("user");
-        http.authorizeRequests().antMatchers(USER_ALL_METHODS_WHITE_LIST).hasAnyAuthority("user");
-        http.authorizeRequests().antMatchers(MODERATOR_WHITE_LIST).hasAnyAuthority("moderator");
-        http.authorizeRequests().antMatchers(ADMIN_WHITE_LIST).hasAnyAuthority("admin");
+        http.authorizeRequests().antMatchers(GET, USER_GET_METHOD_WHITE_LIST).hasAuthority(USER);
+        http.authorizeRequests().antMatchers(POST, "/api/images/**").hasAuthority(USER);
+        http.authorizeRequests().antMatchers(USER_ALL_METHODS_WHITE_LIST).hasAuthority(USER);
+        http.authorizeRequests().antMatchers(MODERATOR_WHITE_LIST).hasAuthority(MODERATOR);
+        http.authorizeRequests().antMatchers(ADMIN_WHITE_LIST).hasAuthority(ADMIN);
         http.authorizeRequests().anyRequest().denyAll();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

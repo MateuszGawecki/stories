@@ -59,7 +59,16 @@ public class UserController {
         this.logService = logService;
     }
 
-    //TODO change user name, surname, imagePath
+    @Operation(summary = "List books recommended for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
+    @GetMapping(value = "/books/recommended", produces = APPLICATION_JSON_VALUE)
+    public List<BookDTO> getRecommended(HttpServletRequest request){
+        User issuer = getIssuer(request);
+
+        return recommendationService.getRecommendedForUser(issuer);
+    }
 
     @Operation(summary = "Change user name, surname or image path")
     @ApiResponses(value = {
@@ -292,7 +301,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "404", description = "Book not found"),
-            @ApiResponse(responseCode = "400", description = "Cannot add the same book twice")
+            @ApiResponse(responseCode = "409", description = "Cannot add the same book twice")
     })
     @PostMapping(value = "/books/{bookId}", produces = APPLICATION_JSON_VALUE)
     public UserBookDTO addBookToUserBooks(HttpServletRequest request, @PathVariable Long bookId){
@@ -399,16 +408,7 @@ public class UserController {
         userBookService.setUserScore(issuer, userBookId, userScore);
     }
 
-    @Operation(summary = "List books recommended for user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200")
-    })
-    @GetMapping(value = "/books/recommended", produces = APPLICATION_JSON_VALUE)
-    public List<BookDTO> getRecommended(HttpServletRequest request){
-        User issuer = getIssuer(request);
 
-        return recommendationService.getRecommendedForUser(issuer);
-    }
 
 
     private User getIssuer(HttpServletRequest request) {

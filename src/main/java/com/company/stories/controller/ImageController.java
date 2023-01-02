@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/image")
+@RequestMapping("/api/images")
 @Slf4j
 @Tag(name = "Images", description = "Endpoints for managing images")
 public class ImageController {

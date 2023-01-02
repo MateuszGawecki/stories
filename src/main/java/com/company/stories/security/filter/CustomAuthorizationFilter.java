@@ -50,8 +50,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                         authorities.add(new SimpleGrantedAuthority(role));
                     });
 
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    username,
+                                    null,
+                                    authorities
+                            );
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
                 }catch (Exception ex){
                     log.error("Error in Authorization Filter ");
                     response.setHeader("error", ex.getMessage());

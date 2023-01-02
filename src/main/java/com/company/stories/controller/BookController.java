@@ -49,7 +49,7 @@ public class BookController {
     @Operation(summary = "Creating new book")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", description = "Book already exist")
+            @ApiResponse(responseCode = "409", description = "Book already exist")
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public BookDTO createBook(HttpServletRequest request, @RequestBody BookDTO bookDTO) {

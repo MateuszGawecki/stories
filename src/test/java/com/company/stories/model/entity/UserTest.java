@@ -16,14 +16,14 @@ public class UserTest {
 
         //when
         User user = User.builder()
-                .user_id(userId)
+                .userId(userId)
                 .name(name)
                 .surname(surname)
                 .email(email)
                 .build();
 
         //then
-        assertEquals(userId, user.getUser_id());
+        assertEquals(userId, user.getUserId());
         assertEquals(name, user.getName());
         assertEquals(surname, user.getSurname());
     }
@@ -35,7 +35,7 @@ public class UserTest {
         String newSurname = "Atkinson";
 
         User user = User.builder()
-                .user_id(userId)
+                .userId(userId)
                 .name(name)
                 .surname(surname)
                 .email(email)
@@ -47,7 +47,7 @@ public class UserTest {
         user.setSurname(newSurname);
 
         //then
-        assertEquals(userId, user.getUser_id());
+        assertEquals(userId, user.getUserId());
         assertEquals(newName, user.getName());
         assertEquals(newSurname, user.getSurname());
     }
