@@ -34,8 +34,8 @@ public class GenreServiceTest {
                 .build();
         //when
         when(genreRepository.findByName(anyString())).thenReturn(Optional.ofNullable(existingGenre));
-        //then
         Genre potentialGenre = genreService.findGenreByName(genreName);
+        //then
         assertEquals(genreName, potentialGenre.getName());
     }
 
