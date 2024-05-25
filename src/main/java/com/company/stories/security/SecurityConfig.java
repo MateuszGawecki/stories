@@ -23,7 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
@@ -72,7 +71,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final List<String> ALLOWED_ORIGINS = Arrays.asList(
             "http://127.0.0.1:3000/",
-            "http://localhost:3000/"
+            "http://localhost:3000/",
+            "http://127.0.0.1:8080/",
+            "http://192.168.0.67:8080/",
+            "http://192.168.0.67:8080",
+            "http://localhost:8080/"
     );
 
     private static final List<String> ALLOWED_METHODS = Arrays.asList(
@@ -100,11 +103,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
         http.authorizeRequests().antMatchers(GET, USER_GET_METHOD_WHITE_LIST).hasAuthority(USER);
-        http.authorizeRequests().antMatchers(POST, "/api/images/**").hasAuthority(USER);
+        http.authorizeRequests().antMatchers(POST, "/api/images/**", "api/security/logout").hasAuthority(USER);
         http.authorizeRequests().antMatchers(USER_ALL_METHODS_WHITE_LIST).hasAuthority(USER);
         http.authorizeRequests().antMatchers(MODERATOR_WHITE_LIST).hasAuthority(MODERATOR);
         http.authorizeRequests().antMatchers(ADMIN_WHITE_LIST).hasAuthority(ADMIN);
+        http.authorizeRequests().antMatchers(GET, "/", "/static/**").permitAll();
         http.authorizeRequests().anyRequest().denyAll();
+
+//        //https
+//        http.requiresChannel().anyRequest().requiresSecure();
+//
+//        //front
+//        http.headers().frameOptions().sameOrigin();
+//        http.headers().contentSecurityPolicy(
+//                "script-src 'self'; "
+//                        + "style-src 'self'; "
+//                        + "img-src 'self' data: blob: ; "
+//                        + "object-src 'none';"
+//                        + " default-src 'self'; "
+//                        + "form-action 'self'; "
+//                        + "base-uri 'none'; "
+////                        + "upgrade-insecure-requests;"
+//        );
+//
+//        //nosniff
+//        http.headers().contentTypeOptions();
+
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
