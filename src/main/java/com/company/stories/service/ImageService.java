@@ -1,8 +1,8 @@
 package com.company.stories.service;
 
-import com.company.stories.exception.image.ImageNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +18,9 @@ import java.nio.file.Paths;
 @Service
 @Slf4j
 public class ImageService {
-    String IMAGE_FOLDER_PATH = "D:\\upload\\";
+
+    @Value("${IMAGE_FOLDER}")
+    String IMAGE_FOLDER_PATH;
     String DEFAULT_IMAGE = "defaultImage.png";
 
     public String saveImage(MultipartFile image) throws IOException {
