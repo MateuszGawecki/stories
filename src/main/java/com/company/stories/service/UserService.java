@@ -8,6 +8,7 @@ import com.company.stories.exception.user.CannotCreateFriendshipException;
 import com.company.stories.exception.user.UserNotFoundException;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.dto.UserRegistrationDTO;
+import com.company.stories.model.dto.UserWithoutDetailsDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
 import com.company.stories.model.mapper.UserMapper;
@@ -110,12 +111,12 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public List<UserDTO> getUserFriends(Long userId){
+    public List<UserWithoutDetailsDTO> getUserFriends(Long userId){
         User dbUser = findUser(userId);
 
         Set<User> userFriends = dbUser.getFriends();
 
-        List<UserDTO> friendsDTOs= userFriends.stream().map(UserMapper::toUserDTO).collect(Collectors.toList());
+        List<UserWithoutDetailsDTO> friendsDTOs= userFriends.stream().map(UserMapper::toUserWithoutDetailsDTO).collect(Collectors.toList());
 
         return friendsDTOs;
     }
@@ -158,8 +159,8 @@ public class UserService implements UserDetailsService {
     }
 
     private Map<String, Object> getPageOfUsers(Page<User> page) {
-        List<UserDTO> userDTOS = page.getContent().stream()
-                .map(UserMapper::toUserDTO)
+        List<UserWithoutDetailsDTO> userDTOS = page.getContent().stream()
+                .map(UserMapper::toUserWithoutDetailsDTO)
                 .collect(Collectors.toList());
 
         Map<String, Object> userPage = new HashMap<>();
@@ -184,8 +185,8 @@ public class UserService implements UserDetailsService {
         Set<Role> userRoles = Set.of(roleService.findRoleByName(DEFAULT_ROLE));
 
         User user = User.builder()
-                .name(userDTO.getName())
-                .surname(userDTO.getSurname())
+                .name(userDTO.getUserWithoutDetailsDTO().getName())
+                .surname(userDTO.getUserWithoutDetailsDTO().getSurname())
                 .email(userDTO.getEmail())
                 .password(userRegistrationDTO.getPassword())
                 .roles(userRoles)
