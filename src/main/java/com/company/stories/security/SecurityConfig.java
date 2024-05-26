@@ -43,7 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             "/api/login",
             "/api/security/token/refresh",
-            "/api/security/register"
+            "/api/security/register",
+            "/api/security/logout"
     };
 
     private static final String[] USER_GET_METHOD_WHITE_LIST = {
@@ -103,7 +104,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll();
         http.authorizeRequests().antMatchers(GET, USER_GET_METHOD_WHITE_LIST).hasAuthority(USER);
-        http.authorizeRequests().antMatchers(POST, "/api/images/**", "api/security/logout").hasAuthority(USER);
+        http.authorizeRequests().antMatchers(POST, "/api/images/**").hasAuthority(USER);
         http.authorizeRequests().antMatchers(USER_ALL_METHODS_WHITE_LIST).hasAuthority(USER);
         http.authorizeRequests().antMatchers(MODERATOR_WHITE_LIST).hasAuthority(MODERATOR);
         http.authorizeRequests().antMatchers(ADMIN_WHITE_LIST).hasAuthority(ADMIN);

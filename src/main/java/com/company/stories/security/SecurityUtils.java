@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class SecurityUtils {
-    private static final long ACCESS_TOKEN_VALID_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+    private static final long ACCESS_TOKEN_VALID_TIME = 1 * 60 * 1000;
+//    private static final long ACCESS_TOKEN_VALID_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
     private static final long REFRESH_TOKEN_VALID_TIME = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
     private static final String ROLE_ID = "roles";
 

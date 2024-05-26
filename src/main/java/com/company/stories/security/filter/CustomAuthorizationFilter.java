@@ -31,8 +31,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if(request.getServletPath().equals("/api/login") ||
-                request.getServletPath().equals("/api/user/token/refresh") ||
-                request.getServletPath().equals("/api/user/register")
+                request.getServletPath().equals("/api/security/token/refresh") ||
+                request.getServletPath().equals("/api/security/register") ||
+                request.getServletPath().equals("/api/security/logout")
         ){
             filterChain.doFilter(request,response);
         }else {
@@ -40,7 +41,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             if(authorizationHeader != null && authorizationHeader.startsWith(BEARER)){
                 try {
                     String token = authorizationHeader.substring(BEARER.length());
-
                     DecodedJWT decodedJWT = SecurityUtils.verifyToken(token);
                     String username = decodedJWT.getSubject();
                     String[] roles = decodedJWT.getClaim(ROLE_ID).asArray(String.class);
@@ -69,6 +69,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     response.setContentType(APPLICATION_JSON_VALUE);
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
+            }else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType(APPLICATION_JSON_VALUE);
             }
 
             filterChain.doFilter(request, response);
