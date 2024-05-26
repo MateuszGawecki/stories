@@ -1,11 +1,9 @@
 package com.company.stories.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.company.stories.model.dto.BookDTO;
-import com.company.stories.model.dto.CommentDTO;
-import com.company.stories.model.dto.UserBookDTO;
-import com.company.stories.model.dto.UserDTO;
+import com.company.stories.model.dto.*;
 import com.company.stories.model.entity.User;
+import com.company.stories.model.mapper.UserMapper;
 import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.LogService;
 import com.company.stories.service.RecommendationService;
@@ -76,10 +74,10 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PutMapping(produces = APPLICATION_JSON_VALUE)
-    public UserDTO editUserInfo(HttpServletRequest request,
-                                @RequestParam(required = false) String name,
-                                @RequestParam(required = false) String surname,
-                                @RequestParam(required = false) String imagePath){
+    public UserWithDetailsDTO editUserInfo(HttpServletRequest request,
+                                           @RequestParam(required = false) String name,
+                                           @RequestParam(required = false) String surname,
+                                           @RequestParam(required = false) String imagePath){
         User issuer = getIssuer(request);
         logService.saveLog(
                 String.format("User %s attempt to edit his data",
@@ -103,7 +101,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping(value = "/myinfo", produces = APPLICATION_JSON_VALUE)
-    public UserDTO getUserInfo(HttpServletRequest request){
+    public UserWithDetailsDTO getUserInfo(HttpServletRequest request){
         User user = getIssuer(request);
         return userService.getUser(user);
     }
@@ -186,9 +184,53 @@ public class UserController {
             Map<String, Object> response = new HashMap<>();
 
             if(searchValue != null){
-                response = userService.getByNameAndSurname(searchValue, pagingSort);
+                response = userService.getByNameAndSurname(searchValue, pagingSort, UserMapper::toUserDTO);
             }else {
-                response = userService.getAllUsers(pagingSort);
+                response = userService.getAllUsers(pagingSort, UserMapper::toUserDTO);
+            }
+
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Getting all users present in data base with extra data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200")
+    })
+    @GetMapping(path = "/withExtra", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getUsersWithExtraData(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size,
+            @RequestParam(defaultValue = "userId,desc") String[] sort,
+            @RequestParam(required = false) String searchValue
+    ){
+        try {
+            List<Sort.Order> orders = new ArrayList<Sort.Order>();
+
+            if (sort[0].contains(",")) {
+                // will sort more than 2 fields
+                // sortOrder="field, direction"
+                for (String sortOrder : sort) {
+                    String[] _sort = sortOrder.split(",");
+                    orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+                }
+            } else {
+                // sort=[field, direction]
+                orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
+            }
+
+            Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
+
+            Map<String, Object> response = new HashMap<>();
+
+            if(searchValue != null){
+                response = userService.getByNameAndSurname(searchValue, pagingSort, UserMapper::toUserWithDetailsDTO);
+            }else {
+                response = userService.getAllUsers(pagingSort, UserMapper::toUserWithDetailsDTO);
             }
 
 

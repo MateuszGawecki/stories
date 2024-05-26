@@ -2,6 +2,7 @@ package com.company.stories.model.mapper;
 
 import com.company.stories.model.dto.RoleDTO;
 import com.company.stories.model.dto.UserDTO;
+import com.company.stories.model.dto.UserWithDetailsDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
 import org.springframework.stereotype.Component;
@@ -17,9 +18,7 @@ public abstract class UserMapper {
                 .userId(userDTO.getUserId())
                 .name(userDTO.getName())
                 .surname(userDTO.getSurname())
-                .email(userDTO.getEmail())
                 .image_path(userDTO.getImagePath())
-                .roles(mapToRolesEntity(userDTO.getRoles()))
                 .build();
     }
 
@@ -28,8 +27,24 @@ public abstract class UserMapper {
                 .userId(user.getUserId())
                 .name(user.getName())
                 .surname(user.getSurname())
-                .email(user.getEmail())
                 .imagePath(user.getImage_path())
+                .build();
+    }
+
+    public static User toUserEntity(UserWithDetailsDTO userWithDetailsDTO){
+        return User.builder()
+                .userId(userWithDetailsDTO.getUserDTO().getUserId())
+                .name(userWithDetailsDTO.getUserDTO().getName())
+                .surname(userWithDetailsDTO.getUserDTO().getSurname())
+                .image_path(userWithDetailsDTO.getUserDTO().getImagePath())
+                .email(userWithDetailsDTO.getEmail())
+                .build();
+    }
+
+    public static UserWithDetailsDTO toUserWithDetailsDTO(User user){
+        return UserWithDetailsDTO.builder()
+                .userDTO(toUserDTO(user))
+                .email(user.getEmail())
                 .roles(mapToRolesDTO(user.getRoles()))
                 .build();
     }

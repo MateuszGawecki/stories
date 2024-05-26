@@ -6,8 +6,10 @@ import com.company.stories.exception.user.FriendshipNotFoundException;
 import com.company.stories.exception.user.UserAlreadyExistsException;
 import com.company.stories.exception.user.CannotCreateFriendshipException;
 import com.company.stories.exception.user.UserNotFoundException;
+import com.company.stories.model.dto.IUserDTO;
 import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.dto.UserRegistrationDTO;
+import com.company.stories.model.dto.UserWithDetailsDTO;
 import com.company.stories.model.entity.Role;
 import com.company.stories.model.entity.User;
 import com.company.stories.model.mapper.UserMapper;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,8 +51,8 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserDTO getUser(User user) {
-        return UserMapper.toUserDTO(user);
+    public UserWithDetailsDTO getUser(User user) {
+        return UserMapper.toUserWithDetailsDTO(user);
     }
 
     public UserDTO getUser(Long userId) {
@@ -135,13 +138,13 @@ public class UserService implements UserDetailsService {
         return  user.get();
     }
 
-    public Map<String, Object> getAllUsers(Pageable pageable){
+    public Map<String, Object> getAllUsers(Pageable pageable, Function<User, IUserDTO> mapper){
         Page<User> page = userRepository.findAll(pageable);
 
-        return getPageOfUsers(page);
+        return getPageOfUsers(page, mapper);
     }
 
-    public Map<String, Object> getByNameAndSurname(String searchValue, Pageable pageable) {
+    public Map<String, Object> getByNameAndSurname(String searchValue, Pageable pageable, Function<User, IUserDTO> mapper) {
         String[] names = searchValue.split(" ");
 
         Page<User> page;
@@ -154,12 +157,12 @@ public class UserService implements UserDetailsService {
             throw new OperationNotPermittedException("Cannot find user with more than 2 names");
         }
 
-        return getPageOfUsers(page);
+        return getPageOfUsers(page, mapper);
     }
 
-    private Map<String, Object> getPageOfUsers(Page<User> page) {
-        List<UserDTO> userDTOS = page.getContent().stream()
-                .map(UserMapper::toUserDTO)
+    private Map<String, Object> getPageOfUsers(Page<User> page, Function<User, IUserDTO> mapper) {
+        List<IUserDTO> userDTOS = page.getContent().stream()
+                .map(mapper)
                 .collect(Collectors.toList());
 
         Map<String, Object> userPage = new HashMap<>();
@@ -174,10 +177,10 @@ public class UserService implements UserDetailsService {
     public UserDTO saveNewUser(UserRegistrationDTO userRegistrationDTO){
         UserDTO userDTO = userRegistrationDTO.getUserDTO();
 
-        Optional<User> dbUser = userRepository.findByEmail(userDTO.getEmail());
+        Optional<User> dbUser = userRepository.findByEmail(userRegistrationDTO.getEmail());
 
         if(dbUser.isPresent())
-            throw new UserAlreadyExistsException(String.format("User with email %s already exist", userDTO.getEmail()));
+            throw new UserAlreadyExistsException(String.format("User with email %s already exist", userRegistrationDTO.getEmail()));
 
         userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
 
@@ -186,7 +189,7 @@ public class UserService implements UserDetailsService {
         User user = User.builder()
                 .name(userDTO.getName())
                 .surname(userDTO.getSurname())
-                .email(userDTO.getEmail())
+                .email(userRegistrationDTO.getEmail())
                 .password(userRegistrationDTO.getPassword())
                 .roles(userRoles)
                 .build();
@@ -262,8 +265,8 @@ public class UserService implements UserDetailsService {
         return byNameDTOs;
     }
 
-    public UserDTO updateUser(User issuer) {
-        return UserMapper.toUserDTO(userRepository.save(issuer));
+    public UserWithDetailsDTO updateUser(User issuer) {
+        return UserMapper.toUserWithDetailsDTO(userRepository.save(issuer));
     }
 
     public boolean isFriendOfIssuer(User issuer, Long userId) {
