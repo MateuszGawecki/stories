@@ -1,7 +1,10 @@
 package com.company.stories.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.company.stories.model.dto.*;
+import com.company.stories.model.dto.BookDTO;
+import com.company.stories.model.dto.CommentDTO;
+import com.company.stories.model.dto.UserBookDTO;
+import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
 import com.company.stories.service.LogService;
@@ -212,7 +215,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping(value = "/friends", produces = APPLICATION_JSON_VALUE)
-    public List<UserWithoutDetailsDTO> getUserFriends(HttpServletRequest request){
+    public List<UserDTO> getUserFriends(HttpServletRequest request){
         User issuer = getIssuer(request);
         return userService.getUserFriends(issuer.getUserId());
     }
@@ -223,7 +226,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping(value = "/{userId}/friends", produces = APPLICATION_JSON_VALUE)
-    public List<UserWithoutDetailsDTO> getUserFriends(@PathVariable Long userId){
+    public List<UserDTO> getUserFriends(@PathVariable Long userId){
         return userService.getUserFriends(userId);
     }
 
