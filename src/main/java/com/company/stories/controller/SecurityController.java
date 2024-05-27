@@ -107,7 +107,7 @@ public class SecurityController {
     }
 
     @Operation(summary = "Logging out")
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = getRefreshTokenFromCookie(request);
 

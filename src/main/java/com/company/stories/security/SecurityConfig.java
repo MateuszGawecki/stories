@@ -76,7 +76,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "http://127.0.0.1:8080/",
             "http://192.168.0.67:8080/",
             "http://192.168.0.67:8080",
-            "http://localhost:8080/"
+            "http://localhost:8080/",
+
+            "http://127.0.0.1:8081/"
     );
 
     private static final List<String> ALLOWED_METHODS = Arrays.asList(

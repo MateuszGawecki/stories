@@ -69,6 +69,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .maxAge(REFRESH_TOKEN_COOKIE_AGE)
                 .secure(true)
                 .sameSite("None")
+                .path("/api")
                 .httpOnly(true)
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
