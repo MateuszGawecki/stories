@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/images")
@@ -36,6 +37,15 @@ public class ImageController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String uploadImage(@RequestParam MultipartFile image, @RequestParam(required = false) String imageName) throws IOException {
         log.info("Saving image");
+        String contentType = image.getContentType();
+        if (contentType == null) {
+            throw new IllegalArgumentException("Must specify MIME type of the file");
+        }
+
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new IllegalArgumentException("Only images are allowed");
+        }
+
         if(imageName != null)
             return imageService.replaceImage(image, imageName);
         else

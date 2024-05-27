@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 
 @Service
@@ -24,7 +25,11 @@ public class ImageService {
     String DEFAULT_IMAGE = "defaultImage.png";
 
     public String saveImage(MultipartFile image) throws IOException {
-        String newName = System.currentTimeMillis() + image.getOriginalFilename();
+        String extension = Objects.requireNonNull(image.getOriginalFilename()).substring(image.getOriginalFilename().lastIndexOf("."));
+        if (!extension.equals(".jpg") && !extension.equals(".jpeg") && !extension.equals(".png")) {
+            throw new IllegalArgumentException("Only images are allowed");
+        }
+        String newName = System.currentTimeMillis() + extension;
         Path filePath = Paths.get(IMAGE_FOLDER_PATH + newName);
         image.transferTo(filePath);
         return newName;
