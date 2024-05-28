@@ -3,7 +3,7 @@ package com.company.stories.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.company.stories.security.SecurityUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class ControllerUtils {
 

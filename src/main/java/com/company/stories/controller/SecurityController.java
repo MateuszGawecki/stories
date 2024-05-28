@@ -5,6 +5,7 @@ import com.company.stories.model.dto.UserDTO;
 import com.company.stories.model.dto.UserRegistrationDTO;
 import com.company.stories.model.entity.User;
 import com.company.stories.security.SecurityUtils;
+import com.company.stories.service.AuthenticationService;
 import com.company.stories.service.LogService;
 import com.company.stories.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,22 +14,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,14 +40,53 @@ public class SecurityController {
     private static final String ACCESS_TOKEN_ID = "access_token";
     private static final String REFRESH_TOKEN_ID = "refresh_token";
 
+    private static final String USERNAME_PARAM_NAME = "username";
+    private static final String PASSWORD_PARAM_NAME = "password";
+    private static final long REFRESH_TOKEN_COOKIE_AGE = 2 * 60 * 60; // 2 hours in seconds
+
     private final UserService userService;
+    private final AuthenticationService authenticationService;
     private final LogService logService;
 
-    public SecurityController(UserService userService, LogService logService) {
+    public SecurityController(UserService userService, AuthenticationService authenticationService, LogService logService) {
         this.userService = userService;
+        this.authenticationService = authenticationService;
         this.logService = logService;
     }
 
+    @PostMapping("/authenticate")
+    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) throws IOException {
+//        String email = request.getParameter(USERNAME_PARAM_NAME);
+//        String password = request.getParameter(PASSWORD_PARAM_NAME);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        Authentication authenticate = authenticationService.authenticate(authenticationToken);
+
+        UserDetails user = userService.loadUserByUsername(username);
+//        String issuer = request.getRequestURL().toString();
+        String issuer = "http://localhost:8080/api/security/authenticate";
+        String accessToken = SecurityUtils.createAccessToken(user, issuer);
+        String refreshToken = SecurityUtils.createRefreshToken(user, issuer);
+
+        ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_ID, refreshToken)
+                .maxAge(REFRESH_TOKEN_COOKIE_AGE)
+                .secure(true)
+                .sameSite("None")
+                .path("/api")
+                .httpOnly(true)
+                .build();
+//        response.setHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+//        Map<String,String> tokens = new HashMap<>();
+//        tokens.put(ACCESS_TOKEN_ID, accessToken);
+//        response.setContentType(APPLICATION_JSON_VALUE);
+//        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+//        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .contentType(MediaType.valueOf(APPLICATION_JSON_VALUE))
+                .body(accessToken);
+    }
 
     @Operation(summary = "Change user password")
     @PutMapping(value = "/password",
